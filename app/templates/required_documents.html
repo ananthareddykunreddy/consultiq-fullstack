@@ -1,0 +1,19 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container">
+    <p class="pill">Checklists</p>
+    <h1>Required documents by service</h1>
+    <div class="cards two">
+      {% for s in services %}
+      <article class="card">
+        <h3>{{ s.category }} - {{ s.title }}</h3>
+        <ul>
+          {% for d in s.documents %}<li>{{ d }}</li>{% endfor %}
+        </ul>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+{% endblock %}

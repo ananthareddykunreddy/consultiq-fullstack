@@ -1,0 +1,45 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main>
+  <section class="hero">
+    <div class="container hero-shell">
+      <div>
+        <p class="pill">Advanced Advisory Platform</p>
+        <h1>Enterprise-grade service experience for CAF, Patronato, Immigration and Business support.</h1>
+        <p class="lead">Designed like a modern consultancy website with operational depth: full booking funnel, client-area tracking, document workflow and admin control center.</p>
+        <div class="actions">
+          <a class="btn primary" href="/services">Explore Services</a>
+          <a class="btn ghost" href="/contact">Book Consultation</a>
+        </div>
+      </div>
+      <aside class="glass-panel">
+        <h3>Capabilities</h3>
+        <ul>
+          <li>Service pages with dedicated booking CTA</li>
+          <li>Client area with status tracking and document uploads</li>
+          <li>Admin dashboard for operations and lead handling</li>
+          <li>News, policy and required-documents hub</li>
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container cards four">
+      {% for item in news %}
+      <article class="card">
+        <p class="meta">{{ item.date }}</p>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.summary }}</p>
+      </article>
+      {% endfor %}
+      <article class="card">
+        <p class="meta">Action Center</p>
+        <h3>Need help today?</h3>
+        <p>Use the service directory to go straight to the correct practice page and submit a request.</p>
+        <a class="inline-link" href="/services">Open service directory</a>
+      </article>
+    </div>
+  </section>
+</main>
+{% endblock %}

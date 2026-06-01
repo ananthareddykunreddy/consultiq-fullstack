@@ -1,0 +1,4 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main class="section"><div class="container auth-wrap"><div class="panel auth-panel"><p class="pill">Admin Login</p><h1>Sign in as administrator</h1>{% if error %}<div class="flash error">{{ error }}</div>{% endif %}<form class="form plain" method="post" action="/admin-login"><label>Email<input type="email" name="email" required></label><label>Password<input type="password" name="password" required></label><button class="btn primary" type="submit">Admin Login</button></form><p><a class="inline-link" href="/admin/2fa/setup">Setup 2FA (after login)</a></p></div></div></main>
+{% endblock %}

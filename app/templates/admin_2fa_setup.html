@@ -1,0 +1,4 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main class="section"><div class="container narrow"><p class="pill">Admin 2FA Setup</p><h1>Enable Two-Factor Authentication</h1><article class="card"><p>Add this secret to your authenticator app:</p><p><strong>{{ secret }}</strong></p><p>OTP URI:</p><p><code>{{ provisioning_uri }}</code></p><form class="form plain" method="post" action="/admin/2fa/setup"><label>Enter current 2FA code<input type="text" name="code" required></label><button class="btn primary" type="submit">Enable 2FA</button></form></article></div></main>
+{% endblock %}

@@ -1,0 +1,4 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main class="section"><div class="container auth-wrap"><div class="panel auth-panel"><p class="pill">Admin 2FA</p><h1>Verify 2FA Code</h1>{% if error %}<div class="flash error">{{ error }}</div>{% endif %}<form class="form plain" method="post" action="/admin-2fa-verify"><label>Authentication Code<input type="text" name="code" required></label><button class="btn primary" type="submit">Verify</button></form></div></div></main>
+{% endblock %}

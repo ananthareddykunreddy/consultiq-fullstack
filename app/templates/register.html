@@ -1,0 +1,21 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main>
+  <section class="section">
+    <div class="container auth-wrap">
+      <div class="panel auth-panel">
+        <p class="pill">Client Registration</p>
+        <h1>Create your account</h1>
+        {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+        <form class="form plain" method="post" action="/register">
+          <label>Full name<input type="text" name="full_name" required></label>
+          <label>Email<input type="email" name="email" required></label>
+          <label>Phone<input type="text" name="phone"></label>
+          <label>Password<input type="password" name="password" required></label>
+          <button class="btn primary" type="submit">Register</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

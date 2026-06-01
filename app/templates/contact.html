@@ -1,0 +1,37 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container split">
+    <div>
+      <p class="pill">Contact Form</p>
+      <h1>Contact ConsultIQ</h1>
+      {% if submitted %}<div class="flash success">Your message has been submitted.</div>{% endif %}
+      <form class="form" method="post" action="/contact">
+        <label>Full name<input type="text" name="full_name" required></label>
+        <label>Email<input type="email" name="email" required></label>
+        <label>Phone<input type="text" name="phone"></label>
+        <label>Subject<input type="text" name="subject" value="{{ selected_service if selected_service else '' }}" required></label>
+        <label>Message<textarea name="message" rows="4" required></textarea></label>
+        <button class="btn primary" type="submit">Submit Contact Form</button>
+      </form>
+    </div>
+    <aside class="card">
+      <h3>Direct Booking</h3>
+      <form class="form plain" method="post" action="/appointments">
+        <label>Full name<input type="text" name="full_name" value="{{ user.full_name if user else '' }}" required></label>
+        <label>Email<input type="email" name="email" value="{{ user.email if user else '' }}" required></label>
+        <label>Phone<input type="text" name="phone" value="{{ user.phone if user and user.phone else '' }}" required></label>
+        <label>Service
+          <select name="service_type" required>
+            <option value="">Select service</option>
+            {% for title in service_titles %}<option value="{{ title }}" {% if selected_service == title %}selected{% endif %}>{{ title }}</option>{% endfor %}
+          </select>
+        </label>
+        <label>Preferred date<input type="date" name="preferred_date" required></label>
+        <label>Case details<textarea name="message" rows="3"></textarea></label>
+        <button class="btn primary" type="submit">Service Booking Button</button>
+      </form>
+    </aside>
+  </div>
+</main>
+{% endblock %}

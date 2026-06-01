@@ -1,0 +1,41 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container split-detail">
+    <article class="card detail-main">
+      <p class="pill">{{ service.category }}</p>
+      <h1>{{ service.title }}</h1>
+      <p class="lead">{{ service.summary }}</p>
+      <h3>Required documents</h3>
+      <ul>
+        {% for d in service.documents %}<li>{{ d }}</li>{% endfor %}
+      </ul>
+      <div class="actions">
+        <a class="btn ghost" href="/required-documents">Open All Checklists</a>
+      </div>
+    </article>
+
+    <aside class="card">
+      <h3>Individual Service Booking Form</h3>
+      {% if booked %}<div class="flash success">Booking submitted for this service.</div>{% endif %}
+      <form class="form plain" method="post" action="/services/{{ service.slug }}/book" enctype="multipart/form-data">
+        <label>Full name<input type="text" name="full_name" value="{{ user.full_name if user else '' }}" required></label>
+        <label>Email<input type="email" name="email" value="{{ user.email if user else '' }}" required></label>
+        <label>Phone<input type="text" name="phone" value="{{ user.phone if user and user.phone else '' }}" required></label>
+        <label>Preferred date<input type="date" name="preferred_date" required></label>
+        <label>Case details<textarea name="message" rows="3" placeholder="Add your case details"></textarea></label>
+        <label>Attach document (optional)<input type="file" name="document"></label>
+        <button class="btn primary" type="submit">Service Booking Form Submit</button>
+      </form>
+      <h3>Related Services</h3>
+      <div class="stack">
+        {% for r in related %}
+        <a class="tile-link" href="/services/{{ r.slug }}">{{ r.title }}</a>
+        {% else %}
+        <p>No related services.</p>
+        {% endfor %}
+      </div>
+    </aside>
+  </div>
+</main>
+{% endblock %}

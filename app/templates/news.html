@@ -1,0 +1,18 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container">
+    <p class="pill">Latest Updates</p>
+    <h1>News & updates</h1>
+    <div class="cards two">
+      {% for item in news %}
+      <article class="card">
+        <p class="meta">{{ item.date }}</p>
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.summary }}</p>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,4 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main class="section"><div class="container auth-wrap"><div class="panel auth-panel"><p class="pill">Client Login</p><h1>Access your client area</h1>{% if error %}<div class="flash error">{{ error }}</div>{% endif %}<form class="form plain" method="post" action="/login"><label>Email<input type="email" name="email" required></label><label>Password<input type="password" name="password" required></label><button class="btn primary" type="submit">Login</button></form><p>New client? <a class="inline-link" href="/register">Create account</a></p><p><a class="inline-link" href="/password-reset-request">Forgot password?</a></p></div></div></main>
+{% endblock %}

@@ -1,0 +1,43 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main>
+  <section class="section">
+    <div class="container">
+      <p class="pill">Admin Panel</p>
+      <h1>Appointment Requests</h1>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Service</th>
+              <th>Date</th>
+              <th>Message</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appointments %}
+            <tr>
+              <td>{{ a['id'] }}</td>
+              <td>{{ a['full_name'] }}</td>
+              <td>{{ a['email'] }}</td>
+              <td>{{ a['phone'] }}</td>
+              <td>{{ a['service_type'] }}</td>
+              <td>{{ a['preferred_date'] }}</td>
+              <td>{{ a['message'] }}</td>
+              <td>{{ a['created_at'] }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="8">No appointments yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

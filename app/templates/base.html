@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title }}</title>
+  <meta name="description" content="ConsultIQ strategic CAF, immigration, patronato and business advisory platform." />
+  <meta name="csrf-token" content="{{ csrf_token }}" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-shell">
+      <a class="brand" href="/"><span class="brand-dot"></span><span>ConsultIQ</span></a>
+      <nav>
+        <a class="{% if page == 'home' %}active{% endif %}" href="/">Home</a>
+        <a class="{% if page == 'services' %}active{% endif %}" href="/services">Services</a>
+        <a class="{% if page == 'news' %}active{% endif %}" href="/news">News</a>
+        <a class="{% if page == 'contact' %}active{% endif %}" href="/contact">Contact</a>
+        <a class="{% if page == 'client' %}active{% endif %}" href="/client-area">Client Area</a>
+        <a class="{% if page == 'admin' %}active{% endif %}" href="/admin">Admin</a>
+        {% if user %}<a href="/logout">Logout</a>{% else %}<a class="{% if page == 'auth' %}active{% endif %}" href="/login">Login</a>{% endif %}
+      </nav>
+    </div>
+  </header>
+
+  {% block content %}{% endblock %}
+
+  <footer class="site-footer">
+    <div class="container footer-shell">
+      <div><strong>ConsultIQ</strong><p>Strategic immigration, CAF, patronato and business support.</p></div>
+      <div class="footer-links"><a href="/required-documents">Required Documents</a><a href="/privacy">Privacy</a><a href="/cookie-policy">Cookie</a><a href="/gdpr">GDPR</a><a href="/legal">Legal</a></div>
+      <div><p>Via Monte Napoleone 8, Milano</p><p>+39 02 0000 0000</p><p>info@consultiq.it</p></div>
+    </div>
+  </footer>
+  <script src="/static/js/security.js" defer></script>
+  <script src="/static/js/dashboard.js" defer></script>
+</body>
+</html>
