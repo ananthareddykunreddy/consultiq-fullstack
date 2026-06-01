@@ -13,10 +13,28 @@
 - 404/500 pages + request logging middleware
 - Health endpoint (`/health`) for monitoring
 
+## GitHub auto-deploy (Linux)
+Workflow file: `.github/workflows/deploy.yml`
+
+Add these GitHub repository secrets:
+- `SERVER_HOST` (your server IP/domain)
+- `SERVER_USER` (SSH user)
+- `SERVER_SSH_KEY` (private key)
+- `SERVER_PORT` (optional, e.g. `22`)
+- `DEPLOY_PATH` (e.g. `/opt/consultiq`)
+
+On every push to `master`, GitHub Actions will:
+1. SSH to server
+2. Pull latest code
+3. Install Python dependencies
+4. Restart `consultiq` service
+5. Check `/health`
+
 ## Operations & deployment assets
 - Nginx reverse-proxy template: `deploy/nginx-consultiq.conf`
 - systemd service template: `deploy/consultiq.service`
 - DB backup script: `scripts/backup-db.ps1`
+- Linux deploy script: `scripts/deploy.sh`
 - Log monitor script: `ops/monitor-log.ps1`
 - PostgreSQL migration bootstrap schema: `migrations/postgres_schema.sql`
 
