@@ -1,59 +1,61 @@
-﻿# ConsultIQ Full-Stack (Launch-Ready)
+﻿# ConsultIQ Full-Stack (cPanel + GitHub Ready)
 
-## Completed hardening and feature bundle
-- Bcrypt password hashing (`passlib`)
-- CSRF protection across POST forms (auto-injected hidden token)
-- Per-IP rate limiting on auth/contact/booking/upload
-- Upload validation (type, size, executable signature block)
-- 2FA for admin using TOTP (`pyotp`)
-- Password reset request + reset flow (token + expiry)
-- Audit logs for critical actions
-- Notification queue + email dispatch hook
-- KPI dashboards + chart widgets + Sheets-style tables
-- 404/500 pages + request logging middleware
-- Health endpoint (`/health`) for monitoring
+## cPanel BASIC deploy (recommended for your hosting)
 
-## GitHub auto-deploy (Linux)
-Workflow file: `.github/workflows/deploy.yml`
+### 1) Clone repository in cPanel
+- cPanel -> `Git Version Control`
+- Clone: `https://github.com/ananthareddykunreddy/consultiq-fullstack.git`
+- Target dir: `~/consultiq-fullstack`
 
-Add these GitHub repository secrets:
-- `SERVER_HOST` (your server IP/domain)
-- `SERVER_USER` (SSH user)
-- `SERVER_SSH_KEY` (private key)
-- `SERVER_PORT` (optional, e.g. `22`)
-- `DEPLOY_PATH` (e.g. `/opt/consultiq`)
+### 2) Create Python App in cPanel
+- cPanel -> `Applications` / `Setup Python App`
+- Python version: highest available (3.10+)
+- Application root: `consultiq-fullstack`
+- Application URL: `consultiq.it` (or test path)
+- Startup file: `passenger_wsgi.py`
+- Entry point: `application`
 
-On every push to `master`, GitHub Actions will:
-1. SSH to server
-2. Pull latest code
-3. Install Python dependencies
-4. Restart `consultiq` service
-5. Check `/health`
+### 3) Install dependencies
+Use cPanel terminal (inside Python app virtualenv):
+```bash
+cd ~/consultiq-fullstack
+pip install -r requirements.txt
+```
 
-## Operations & deployment assets
-- Nginx reverse-proxy template: `deploy/nginx-consultiq.conf`
-- systemd service template: `deploy/consultiq.service`
-- DB backup script: `scripts/backup-db.ps1`
-- Linux deploy script: `scripts/deploy.sh`
-- Log monitor script: `ops/monitor-log.ps1`
-- PostgreSQL migration bootstrap schema: `migrations/postgres_schema.sql`
-
-## Environment variables
-Copy `.env.example` and set strong values:
+### 4) Set environment variables in Python App UI
+Set at minimum:
 - `CONSULTIQ_SESSION_SECRET`
+- `CONSULTIQ_ADMIN_EMAIL`
 - `CONSULTIQ_ADMIN_PASSWORD`
-- `CONSULTIQ_DB_PATH`
-- SMTP variables for real email notifications
+- `CONSULTIQ_MAX_UPLOAD_BYTES`
+- Optional SMTP vars for email notifications
 
-## Test and validation
-- Run: `python -m py_compile app/main.py`
-- Run: `python -m pytest -q`
+### 5) Ensure writable data directories
+```bash
+mkdir -p ~/consultiq-fullstack/app/data/uploads
+chmod -R 755 ~/consultiq-fullstack/app/data
+```
 
-## Main routes
-- `/`, `/services`, `/services/{slug}`
-- `/news`, `/required-documents`
-- `/contact`, `/client-area`, `/admin`
-- `/admin/2fa/setup`, `/admin-2fa-verify`
-- `/password-reset-request`, `/password-reset/{token}`
-- `/privacy`, `/cookie-policy`, `/gdpr`, `/legal`
-- `/health`
+### 6) Restart app
+- In cPanel Python App panel click `Restart`
+
+### 7) Verify
+- `https://consultiq.it/health`
+
+## Files added for cPanel
+- `passenger_wsgi.py` (WSGI entrypoint)
+- `.cpanel.yml` (optional cPanel deploy tasks)
+
+## Existing GitHub Action
+- `.github/workflows/deploy.yml` is currently VPS/SSH style.
+- For cPanel shared hosting, use cPanel Git Pull + Python App Restart.
+
+## Security/features included
+- Bcrypt auth
+- CSRF + rate limiting
+- Admin 2FA (TOTP)
+- Password reset flow
+- Audit logs + notifications
+- KPI dashboards + sheets-style tables
+- Upload validation
+- Health endpoint
