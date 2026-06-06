@@ -1,44 +1,70 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block content %}
 <main>
-  <section class="hero">
-    <div class="container hero-shell">
+  <section class="home-intro">
+    <div class="container home-intro-shell">
       <div>
-        <p class="pill">Advanced Advisory Platform</p>
-        <h1>Enterprise-grade service experience for CAF, Patronato, Immigration and Business support.</h1>
-        <p class="lead">Designed like a modern consultancy website with operational depth: full booking funnel, client-area tracking, document workflow and admin control center.</p>
+        <p class="pill">CAF, Patronato e Servizi al Cittadino</p>
+        <h1>Soluzioni Semplici per le Tue Pratiche</h1>
+        <p class="lead">Gestire documenti e scadenze non deve essere un problema. Il nostro team di esperti è qui per semplificare la tua vita burocratica, garantendoti l'accesso a tutti i bonus e le agevolazioni che ti spettano.</p>
         <div class="actions">
-          <a class="btn primary" href="/services">Explore Services</a>
-          <a class="btn ghost" href="/contact">Book Consultation</a>
+          <a class="btn primary" href="/services">Tutti i Nostri Servizi</a>
+          <a class="btn ghost" href="/contact">Contattaci</a>
         </div>
       </div>
-      <aside class="glass-panel">
-        <h3>Capabilities</h3>
-        <ul>
-          <li>Service pages with dedicated booking CTA</li>
-          <li>Client area with status tracking and document uploads</li>
-          <li>Admin dashboard for operations and lead handling</li>
-          <li>News, policy and required-documents hub</li>
-        </ul>
+      <aside class="home-contact-strip">
+        <strong>Consultiq Italy</strong>
+        <span>Via Licinio Murena 32-34, Roma</span>
+        <span>Metro A - Numidio Quadrato</span>
+        <a href="tel:+390697616812">0697616812</a>
       </aside>
     </div>
   </section>
 
   <section class="section">
-    <div class="container cards four">
-      {% for item in news %}
-      <article class="card">
-        <p class="meta">{{ item.date }}</p>
-        <h3>{{ item.title }}</h3>
-        <p>{{ item.summary }}</p>
+    <div class="container home-service-grid">
+      <article class="home-service-card">
+        <h3>Modello 730 e Redditi</h3>
+        <p>Assistenza completa per la dichiarazione dei redditi e l'ottimizzazione fiscale.</p>
+        <a class="inline-link" href="/services/caf-730">Scopri di più</a>
       </article>
-      {% endfor %}
-      <article class="card">
-        <p class="meta">Action Center</p>
-        <h3>Need help today?</h3>
-        <p>Use the service directory to go straight to the correct practice page and submit a request.</p>
-        <a class="inline-link" href="/services">Open service directory</a>
+      <article class="home-service-card">
+        <h3>Calcolo ISEE e Bonus</h3>
+        <p>Elaborazione certificazione ISEE per accedere a agevolazioni e bonus statali.</p>
+        <a class="inline-link" href="/services/caf-isee">Scopri di più</a>
       </article>
+      <article class="home-service-card">
+        <h3>Pensioni e Previdenza</h3>
+        <p>Consulenza per domande di pensione e controllo della posizione contributiva.</p>
+        <a class="inline-link" href="/services/patronato-pensione">Scopri di più</a>
+      </article>
+      <article class="home-service-card">
+        <h3>Pratiche d'Immigrazione</h3>
+        <p>Supporto per rinnovo permessi di soggiorno, visti e cittadinanza italiana.</p>
+        <a class="inline-link" href="/services/immigration-residence-permit">Scopri di più</a>
+      </article>
+      <article class="home-service-card">
+        <h3>Sostegno alla Famiglia</h3>
+        <p>Gestione domande per assegno unico, bonus nido e indennità di maternità.</p>
+        <a class="inline-link" href="/services/patronato-assegno-unico">Scopri di più</a>
+      </article>
+      <article class="home-service-card home-service-card-accent">
+        <h3>Tutti i Nostri Servizi</h3>
+        <p>Esplora l'elenco completo delle prestazioni offerte dal nostro ufficio CAF.</p>
+        <a class="inline-link" href="/services">Vedi tutti</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="section home-updates">
+    <div class="container home-updates-shell">
+      <p class="pill">Ultimi Aggiornamenti</p>
+      <div class="update-tags" aria-label="Ultimi aggiornamenti">
+        <a href="/services/caf-bonus">Bonus</a>
+        <a href="/services/caf-730">730</a>
+        <a href="/services/caf-isee">ISEE</a>
+        <a href="/services/caf-bonus">Bonus Famiglia</a>
+      </div>
     </div>
   </section>
 </main>
