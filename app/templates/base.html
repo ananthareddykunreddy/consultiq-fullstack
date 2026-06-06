@@ -19,7 +19,7 @@
         <a class="{% if page == 'contact' %}active{% endif %}" href="/contact">Contact</a>
         <a class="{% if page == 'client' %}active{% endif %}" href="/client-area">Client Area</a>
         <a class="{% if page == 'admin' %}active{% endif %}" href="/admin">Admin</a>
-        {% if user %}<a href="/logout">Logout</a>{% else %}<a class="{% if page == 'auth' %}active{% endif %}" href="/login">Login</a>{% endif %}
+        {% if user %}<a href="/logout">Logout</a>{% endif %}
       </nav>
     </div>
   </header>
@@ -28,11 +28,56 @@
 
   <footer class="site-footer">
     <div class="container footer-shell">
-      <div><strong>ConsultIQ</strong><p>Strategic immigration, CAF, patronato and business support.</p></div>
-      <div class="footer-links"><a href="/required-documents">Required Documents</a><a href="/privacy">Privacy</a><a href="/cookie-policy">Cookie</a><a href="/gdpr">GDPR</a><a href="/legal">Legal</a></div>
-      <div><p>Via Monte Napoleone 8, Milano</p><p>+39 02 0000 0000</p><p>info@consultiq.it</p></div>
+      <div class="footer-brand">
+        <a class="footer-logo" href="/"><span class="brand-dot"></span><span>ConsultIQ</span></a>
+        <p>Strategic immigration, CAF, patronato and business support for clients building their next step in Italy.</p>
+        <div class="footer-badges">
+          <span>CAF</span>
+          <span>Immigration</span>
+          <span>Business</span>
+        </div>
+        <div class="footer-social">
+          <a href="https://wa.me/390200000000" target="_blank" rel="noreferrer">WhatsApp</a>
+          <a href="https://www.instagram.com/consultiq.it/" target="_blank" rel="noreferrer">Instagram</a>
+          <a href="https://www.facebook.com/consultiq.it/" target="_blank" rel="noreferrer">Facebook</a>
+        </div>
+      </div>
+      <div class="footer-column">
+        <h3>Services</h3>
+        <a href="/services/caf-isee">ISEE Declaration</a>
+        <a href="/services/immigration-permesso">Permesso di Soggiorno</a>
+        <a href="/services/business-partita-iva">Partita IVA</a>
+        <a href="/required-documents">Required Documents</a>
+      </div>
+      <div class="footer-column">
+        <h3>Platform</h3>
+        <a href="/client-area">Client Area</a>
+        <a href="/admin">Admin</a>
+        <a href="/news">News</a>
+        <a href="/contact">Contact</a>
+      </div>
+      <div class="footer-column footer-contact">
+        <h3>Contact</h3>
+        <p>Via Monte Napoleone 8, Milano</p>
+        <a href="tel:+390200000000">+39 02 0000 0000</a>
+        <a href="mailto:info@consultiq.it">info@consultiq.it</a>
+        <a href="https://wa.me/390200000000" target="_blank" rel="noreferrer">WhatsApp</a>
+        <a class="footer-cta" href="/contact">Book Consultation</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>&copy; 2026 ConsultIQ. All rights reserved.</p>
+      <div class="footer-legal">
+        <a href="/privacy">Privacy</a>
+        <a href="/cookie-policy">Cookie</a>
+        <a href="/gdpr">GDPR</a>
+        <a href="/legal">Legal</a>
+      </div>
     </div>
   </footer>
+  <a class="whatsapp-float" href="https://wa.me/390200000000" target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp">
+    <span>WhatsApp</span>
+  </a>
   <script src="/static/js/security.js" defer></script>
   <script src="/static/js/dashboard.js" defer></script>
 </body>

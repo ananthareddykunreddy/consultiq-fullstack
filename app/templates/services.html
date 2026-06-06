@@ -4,19 +4,27 @@
   <div class="container">
     <p class="pill">Service Portfolio</p>
     <h1>All services</h1>
-    <div class="cards three">
-      {% for s in services %}
-      <article class="card service-card">
-        <p class="meta">{{ s.category }}</p>
-        <h3>{{ s.title }}</h3>
-        <p>{{ s.summary }}</p>
-        <div class="actions compact">
-          <a class="btn ghost" href="/services/{{ s.slug }}">View Details</a>
-          <a class="btn primary" href="/contact?service={{ s.category }} - {{ s.title }}">Service Booking Button</a>
-        </div>
-      </article>
-      {% endfor %}
-    </div>
+    {% for category in service_categories %}
+    <section class="service-category">
+      <div class="service-category-head">
+        <h2>{{ category }}</h2>
+        <span>{{ grouped_services[category] | length }} services</span>
+      </div>
+      <div class="cards three">
+        {% for s in grouped_services[category] %}
+        <article class="card service-card">
+          <p class="meta">{{ s.category }}</p>
+          <h3>{{ s.title }}</h3>
+          <p>{{ s.summary }}</p>
+          <div class="actions compact">
+            <a class="btn ghost" href="/services/{{ s.slug }}">View Details</a>
+            <a class="btn primary" href="/contact?service={{ s.category }} - {{ s.title }}">Book</a>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
   </div>
 </main>
 {% endblock %}

@@ -37,20 +37,79 @@ SMTP_FROM = os.getenv("CONSULTIQ_SMTP_FROM", "noreply@consultiq.local")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 RATE_LIMIT_STORE: dict[str, list[float]] = {}
 
+COMMON_DOCUMENTS = ["ID or passport", "Codice fiscale", "Contact details", "Existing case documents"]
+
+
+def service(slug: str, category: str, title: str, summary: str, documents: list[str] | None = None) -> dict[str, Any]:
+    return {
+        "slug": slug,
+        "category": category,
+        "title": title,
+        "summary": summary,
+        "documents": documents or COMMON_DOCUMENTS,
+    }
+
+
 SERVICES = [
-    {"slug": "caf-isee", "category": "CAF", "title": "ISEE Declaration", "summary": "Family economic profile support for bonus and welfare access.", "documents": ["ID/Passport", "Codice Fiscale", "Income Records", "Residence Certificate"]},
-    {"slug": "caf-730", "category": "CAF", "title": "730 Tax Filing", "summary": "Annual personal tax declaration with full checklist and validation.", "documents": ["CU/Income Statement", "Medical expenses", "Rent/Mortgage docs", "ID + Codice Fiscale"]},
-    {"slug": "caf-f24", "category": "CAF", "title": "F24 Payment Forms", "summary": "Tax/payment form preparation and submission guidance.", "documents": ["Payment reference", "Tax code details", "ID document"]},
-    {"slug": "patronato-pensione", "category": "Patronato", "title": "Pensione Support", "summary": "Pension practice support, planning and filing assistance.", "documents": ["ID", "Contribution history", "Employment records"]},
-    {"slug": "patronato-disoccupazione", "category": "Patronato", "title": "Disoccupazione / NASPI", "summary": "Unemployment benefits request and status handling.", "documents": ["Termination letter", "Employment contract", "IBAN", "ID"]},
-    {"slug": "immigration-permesso", "category": "Immigration", "title": "Permesso di Soggiorno", "summary": "Permit issuance/renewal with full procedural support.", "documents": ["Passport", "Current permit", "Accommodation proof", "Income proof"]},
-    {"slug": "immigration-cittadinanza", "category": "Immigration", "title": "Citizenship Application", "summary": "Eligibility review and complete citizenship dossier preparation.", "documents": ["Birth certificate", "Residence records", "Language cert", "Criminal clearance"]},
-    {"slug": "business-partita-iva", "category": "Business", "title": "Partita IVA Opening", "summary": "Entity setup, tax regime guidance and registration workflow.", "documents": ["ID", "Business activity details", "Residence proof"]},
-    {"slug": "business-fattura-elettronica", "category": "Business", "title": "Fattura Elettronica", "summary": "E-invoicing setup and compliance operations for businesses.", "documents": ["VAT profile", "SDI/PEC details", "Company registration info"]},
-    {"slug": "support-traduzioni-legalizzazione", "category": "Support", "title": "Translations & Legalization", "summary": "Certified translation and legalization management for official use.", "documents": ["Original documents", "Destination authority info", "ID"]},
+    service("caf-730", "CAF", "730 Tax Filing", "Annual personal tax declaration with full checklist and validation.", ["CU or income statement", "Deductible expenses", "ID and codice fiscale"]),
+    service("caf-bonus", "CAF", "Bonus Applications", "Support for household, family and public benefit bonus requests."),
+    service("caf-cambio-residenza", "CAF", "Cambio Residenza", "Residence change request preparation and municipal filing support."),
+    service("caf-f24", "CAF", "F24 Payment Forms", "Tax and payment form preparation with guided submission support."),
+    service("caf-imu", "CAF", "IMU", "Municipal property tax calculation and filing support."),
+    service("caf-isee", "CAF", "ISEE Declaration", "Family economic profile support for bonus and welfare access.", ["ID or passport", "Codice fiscale", "Income records", "Residence certificate"]),
+    service("caf-modello-redditi", "CAF", "Modello Redditi", "Income declaration support for individuals and special filing cases."),
+    service("caf-pec", "CAF", "PEC", "Certified email setup and administrative support."),
+    service("caf-red-icric", "CAF", "RED / ICRIC", "Pension and disability declaration support."),
+    service("caf-spid", "CAF", "SPID", "Digital identity activation and assistance."),
+    service("caf-successioni", "CAF", "Successioni", "Inheritance declaration and document preparation support."),
+    service("patronato-adi", "Patronato", "ADI", "Support for inclusion allowance and related welfare practices."),
+    service("patronato-assegno-unico", "Patronato", "Assegno Unico", "Family allowance application and renewal assistance."),
+    service("patronato-dimissioni", "Patronato", "Dimissioni", "Online resignation procedure support."),
+    service("patronato-disoccupazione", "Patronato", "Disoccupazione / NASPI", "Unemployment benefits request and status handling.", ["Termination letter", "Employment contract", "IBAN", "ID"]),
+    service("patronato-invalidita-civile", "Patronato", "Invalidita Civile", "Civil disability application and documentation support."),
+    service("patronato-legge-104", "Patronato", "Legge 104", "Assistance with Legge 104 requests and supporting documents."),
+    service("patronato-maternita", "Patronato", "Maternita", "Maternity benefit application support."),
+    service("patronato-pensione", "Patronato", "Pensione", "Pension practice support, planning and filing assistance.", ["ID", "Contribution history", "Employment records"]),
+    service("immigration-asilo-politico", "Immigration", "Asilo Politico", "Political asylum procedure guidance and document review."),
+    service("immigration-cittadinanza", "Immigration", "Cittadinanza", "Citizenship eligibility review and application support.", ["Birth certificate", "Residence records", "Language certificate", "Criminal clearance"]),
+    service("immigration-conversione-permesso", "Immigration", "Conversione Permesso", "Permit conversion support for eligible immigration cases."),
+    service("immigration-document-translation", "Immigration", "Document Translation", "Translation support for immigration and administrative dossiers."),
+    service("immigration-flussi", "Immigration", "Flussi", "Decreto flussi application and document preparation support."),
+    service("immigration-international-documents", "Immigration", "International Documents", "Support for international documents, legalization and administrative use."),
+    service("immigration-kit-soggiorno", "Immigration", "Kit Soggiorno", "Postal kit preparation for stay permit requests and renewals."),
+    service("immigration-residence-permit", "Immigration", "Residence Permit", "Permit issuance and renewal with full procedural support.", ["Passport", "Current permit", "Accommodation proof", "Income proof"]),
+    service("immigration-ricongiungimento-familiare", "Immigration", "Ricongiungimento Familiare", "Family reunification application and document support."),
+    service("admission-borsa-di-studio", "Admission", "Borsa di Studio", "Scholarship application and document preparation support."),
+    service("admission-student-document-support", "Admission", "Student Document Support", "Student paperwork, enrollment and administrative assistance."),
+    service("admission-university-applications", "Admission", "University Applications", "University admission guidance and application filing."),
+    service("embassy-citizenship", "Embassy", "Citizenship", "Embassy-related citizenship paperwork and appointment support."),
+    service("embassy-oci-card", "Embassy", "OCI Card", "OCI card application and document assistance."),
+    service("embassy-passport-application", "Embassy", "Passport Application", "Passport application preparation and appointment support."),
+    service("embassy-passport-miscellaneous-services", "Embassy", "Passport Miscellaneous Services", "Support for passport corrections, renewals and related services."),
+    service("embassy-passport-surrender", "Embassy", "Passport Surrender", "Passport surrender application and document support."),
+    service("embassy-visa-services", "Embassy", "Visa Services", "Visa document preparation and application assistance."),
+    service("business-camera-di-commercio", "Business", "Camera di Commercio", "Chamber of commerce filings and company records support."),
+    service("business-certificazione-unica", "Business", "Certificazione Unica", "CU preparation and administrative support for businesses."),
+    service("business-corso-sab-ex-rec", "Business", "Corso SAB Ex REC", "Guidance for SAB Ex REC course enrollment and documentation."),
+    service("business-fattura-elettronica", "Business", "Fattura Elettronica", "E-invoicing setup and compliance operations for businesses.", ["VAT profile", "SDI or PEC details", "Company registration info"]),
+    service("business-partita-iva", "Business", "Partita IVA", "VAT setup, tax regime guidance and registration workflow.", ["ID", "Business activity details", "Residence proof"]),
+    service("business-riduzione-contributi-inps", "Business", "Riduzione Contributi INPS", "INPS contribution reduction request support."),
+    service("business-scia", "Business", "SCIA", "SCIA filing support for business activities and authorizations."),
+    service("support-abbonamento-agevolazione", "Support", "Abbonamento Agevolazione", "Discounted subscription and local benefit application support."),
+    service("support-account-registration-apps", "Support", "Account Registration Apps", "Account setup for public and service apps."),
+    service("support-appartamenti-affitto-garanzie", "Support", "Appartamenti Affitto Garanzie", "Rental, guarantee and housing document support."),
+    service("support-asilo-nido-iscrizione", "Support", "Asilo Nido Iscrizione", "Nursery enrollment application support."),
+    service("support-assicurazione-auto-moto", "Support", "Assicurazione Auto Moto", "Car and motorbike insurance support."),
+    service("support-domanda-mensa", "Support", "Domanda Mensa", "School meal application assistance."),
+    service("support-esenzione-tari", "Support", "Esenzione TARI", "TARI exemption request support."),
+    service("support-rider-compensation", "Support", "Rider Compensation", "Support for rider compensation and related claims."),
+    service("support-tessera-sanitaria-codice-fiscale", "Support", "Tessera Sanitaria / Codice Fiscale", "Health card and tax code assistance."),
+    service("support-test-lingua-a2", "Support", "Test Lingua A2", "A2 Italian language test booking and preparation support."),
+    service("support-traduzioni-legalizzazione", "Support", "Traduzioni e Legalizzazione", "Certified translation and legalization management for official use.", ["Original documents", "Destination authority info", "ID"]),
 ]
 SERVICE_BY_SLUG = {s["slug"]: s for s in SERVICES}
 SERVICE_TITLES = [f"{s['category']} - {s['title']}" for s in SERVICES]
+SERVICE_CATEGORIES = ["CAF", "Patronato", "Immigration", "Admission", "Embassy", "Business", "Support"]
 NEWS_ITEMS = [
     {"date": "2026-05-10", "title": "730 Campaign Open", "summary": "Priority slots opened for early filing and document validation."},
     {"date": "2026-05-22", "title": "Permit Renewal Fast Track", "summary": "New workflow reduces missing-document rework for renewals."},
@@ -202,7 +261,11 @@ def startup_event() -> None:
 
 
 def render(request: Request, template: str, **context: Any):
-    return templates.TemplateResponse(template, {"request": request, "user": get_current_user(request), "services": SERVICES, "service_titles": SERVICE_TITLES, "csrf_token": get_or_create_csrf_token(request), **context})
+    grouped_services = {
+        category: [svc for svc in SERVICES if svc["category"] == category]
+        for category in SERVICE_CATEGORIES
+    }
+    return templates.TemplateResponse(template, {"request": request, "user": get_current_user(request), "services": SERVICES, "service_titles": SERVICE_TITLES, "service_categories": SERVICE_CATEGORIES, "grouped_services": grouped_services, "csrf_token": get_or_create_csrf_token(request), **context})
 
 
 @app.middleware("http")
