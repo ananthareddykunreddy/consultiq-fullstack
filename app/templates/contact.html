@@ -30,7 +30,7 @@
       <p><a class="inline-link" href="https://wa.me/393444881606" target="_blank" rel="noreferrer">WhatsApp: 344 488 1606</a></p>
       <p><a class="inline-link" href="mailto:info@consultiq.it">info@consultiq.it</a></p>
       <h3>Direct Booking</h3>
-      <form class="form plain" method="post" action="/appointments">
+      <form class="form plain" method="post" action="/appointments" enctype="multipart/form-data">
         <label>Full name<input type="text" name="full_name" value="{{ user.full_name if user else '' }}" required></label>
         <label>Email<input type="email" name="email" value="{{ user.email if user else '' }}" required></label>
         <label>Phone<input type="text" name="phone" value="{{ user.phone if user and user.phone else '' }}" required></label>
@@ -42,6 +42,7 @@
         </label>
         <label>Preferred date<input type="date" name="preferred_date" required></label>
         <label>Case details<textarea name="message" rows="3"></textarea></label>
+        <label>Upload document (optional)<input type="file" name="document" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"></label>
         <button class="btn primary" type="submit">Service Booking Button</button>
       </form>
     </aside>

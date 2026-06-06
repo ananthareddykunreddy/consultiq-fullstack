@@ -186,6 +186,17 @@ def validate_upload(document: UploadFile | None) -> None:
         raise HTTPException(status_code=400, detail="Executable files are not allowed")
 
 
+def save_appointment_document(conn: sqlite3.Connection, appointment_id: int, uploaded_by_user_id: int | None, document: UploadFile) -> None:
+    safe_name = f"{uuid.uuid4().hex}_{Path(document.filename or 'upload.bin').name}"
+    save_path = UPLOAD_DIR / safe_name
+    with save_path.open("wb") as buffer:
+        shutil.copyfileobj(document.file, buffer)
+    conn.execute(
+        "INSERT INTO appointment_documents (appointment_id, uploaded_by_user_id, original_filename, stored_filename, file_path) VALUES (?, ?, ?, ?, ?)",
+        (appointment_id, uploaded_by_user_id, document.filename or "document", safe_name, f"/uploads/{safe_name}"),
+    )
+
+
 def get_current_user(request: Request) -> dict[str, Any] | None:
     user_id = request.session.get("user_id")
     if not user_id:
@@ -325,11 +336,7 @@ def book_service_detail(request: Request, slug: str, csrf_token: str = Form(...)
         cur = conn.execute("INSERT INTO appointments (user_id, full_name, email, phone, service_type, preferred_date, message) VALUES (?, ?, ?, ?, ?, ?, ?)", (user_id, full_name.strip(), email.strip(), phone.strip(), service_type, preferred_date.strip(), message.strip()))
         appointment_id = cur.lastrowid
         if document and document.filename:
-            safe_name = f"{uuid.uuid4().hex}_{Path(document.filename).name}"
-            save_path = UPLOAD_DIR / safe_name
-            with save_path.open("wb") as buffer:
-                shutil.copyfileobj(document.file, buffer)
-            conn.execute("INSERT INTO appointment_documents (appointment_id, uploaded_by_user_id, original_filename, stored_filename, file_path) VALUES (?, ?, ?, ?, ?)", (appointment_id, user_id, document.filename, safe_name, f"/uploads/{safe_name}"))
+            save_appointment_document(conn, appointment_id, user_id, document)
     add_audit_log(user_id, "service_booked", "appointment", str(appointment_id), service_type)
     add_notification(user_id, email.strip(), "email", "Booking Received", f"Your booking for {service_type} was received.")
     return RedirectResponse(url=f"/services/{slug}?booked=1", status_code=303)
@@ -395,11 +402,7 @@ def upload_appointment_document(request: Request, appointment_id: int, csrf_toke
         owns = appt["user_id"] == user["id"] or appt["email"] == user["email"] or user["role"] == "admin"
         if not owns:
             return RedirectResponse(url="/client-area", status_code=303)
-        safe_name = f"{uuid.uuid4().hex}_{Path(document.filename or 'upload.bin').name}"
-        save_path = UPLOAD_DIR / safe_name
-        with save_path.open("wb") as buffer:
-            shutil.copyfileobj(document.file, buffer)
-        conn.execute("INSERT INTO appointment_documents (appointment_id, uploaded_by_user_id, original_filename, stored_filename, file_path) VALUES (?, ?, ?, ?, ?)", (appointment_id, user["id"], document.filename or "document", safe_name, f"/uploads/{safe_name}"))
+        save_appointment_document(conn, appointment_id, user["id"], document)
     add_audit_log(user["id"], "document_uploaded", "appointment", str(appointment_id), document.filename or "document")
     return RedirectResponse(url="/client-area", status_code=303)
 
@@ -508,14 +511,17 @@ def contact_submit(request: Request, csrf_token: str = Form(...), full_name: str
 
 
 @app.post("/appointments")
-def create_appointment(request: Request, csrf_token: str = Form(...), full_name: str = Form(...), email: str = Form(...), phone: str = Form(...), service_type: str = Form(...), preferred_date: str = Form(...), message: str = Form("")):
+def create_appointment(request: Request, csrf_token: str = Form(...), full_name: str = Form(...), email: str = Form(...), phone: str = Form(...), service_type: str = Form(...), preferred_date: str = Form(...), message: str = Form(""), document: UploadFile | None = File(default=None)):
     enforce_csrf(request, csrf_token)
     check_rate_limit(request, "create_appointment", 20, 300)
+    validate_upload(document)
     user = get_current_user(request)
     user_id = user["id"] if user else None
     with sqlite3.connect(DB_PATH) as conn:
         cur = conn.execute("INSERT INTO appointments (user_id, full_name, email, phone, service_type, preferred_date, message) VALUES (?, ?, ?, ?, ?, ?, ?)", (user_id, full_name.strip(), email.strip(), phone.strip(), service_type.strip(), preferred_date.strip(), message.strip()))
         appointment_id = cur.lastrowid
+        if document and document.filename:
+            save_appointment_document(conn, appointment_id, user_id, document)
     add_audit_log(user_id, "appointment_created", "appointment", str(appointment_id), service_type)
     add_notification(user_id, email.strip(), "email", "Appointment Request Received", f"Your request for {service_type} was submitted.")
     return RedirectResponse(url="/client-area" if user else "/contact?submitted=1", status_code=303)

@@ -29,3 +29,10 @@ def test_health_ok():
 def test_password_reset_request_page_ok():
     response = client.get("/password-reset-request")
     assert response.status_code == 200
+
+
+def test_contact_booking_form_has_document_upload():
+    response = client.get("/contact")
+    assert response.status_code == 200
+    assert 'enctype="multipart/form-data"' in response.text
+    assert 'name="document"' in response.text
