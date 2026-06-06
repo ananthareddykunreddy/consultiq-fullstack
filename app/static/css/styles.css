@@ -146,6 +146,20 @@ h3 { margin: .2rem 0 .5rem; }
 .service-category-head span { color: var(--muted); font-weight: 700; }
 .meta { margin: 0; font-size: .82rem; color: var(--primary); font-weight: 700; letter-spacing: .03em; }
 .inline-link { color: var(--primary); text-decoration: none; font-weight: 700; }
+.map-frame {
+  border: 1px solid var(--line);
+  border-radius: .9rem;
+  box-shadow: 0 12px 26px rgba(11, 41, 63, .08);
+  height: 230px;
+  margin: .85rem 0 .4rem;
+  overflow: hidden;
+}
+.map-frame iframe {
+  border: 0;
+  display: block;
+  height: 100%;
+  width: 100%;
+}
 .split, .split-detail { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(300px,.8fr); gap: 1rem; }
 .detail-main li { margin-bottom: .3rem; }
 .stack { display: grid; gap: .55rem; }
