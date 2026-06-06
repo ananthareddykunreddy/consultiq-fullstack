@@ -17,6 +17,12 @@ body { margin: 0; font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif; colo
 .site-header { position: sticky; top: 0; z-index: 30; background: rgba(255,255,255,.86); border-bottom: 1px solid var(--line); backdrop-filter: blur(10px); }
 .nav-shell { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; }
 .brand { display: inline-flex; align-items: center; gap: .55rem; text-decoration: none; color: var(--text); font-weight: 800; font-size: 1.2rem; }
+.brand-logo img {
+  display: block;
+  height: 48px;
+  max-width: 190px;
+  object-fit: contain;
+}
 .brand-dot { width: 12px; height: 12px; border-radius: 999px; background: linear-gradient(135deg, var(--accent), var(--secondary)); box-shadow: 0 0 0 6px rgba(25,168,146,.12); }
 nav { display: flex; flex-wrap: wrap; gap: .3rem; }
 nav a { text-decoration: none; color: var(--muted); font-weight: 700; padding: .35rem .52rem; border-radius: .55rem; }
@@ -107,6 +113,15 @@ th { background: var(--surface-soft); }
   font-size: 1.25rem;
   font-weight: 800;
   text-decoration: none;
+}
+.footer-logo img {
+  background: #fff;
+  border-radius: .55rem;
+  display: block;
+  height: 58px;
+  max-width: 220px;
+  object-fit: contain;
+  padding: .32rem .45rem;
 }
 .footer-brand p,
 .footer-contact p,
@@ -221,6 +236,7 @@ th { background: var(--surface-soft); }
 @media (max-width: 720px) {
   .hero-shell, .split, .split-detail, .cards.four, .cards.three, .cards.two, .footer-shell, .kpi-grid { grid-template-columns: 1fr; }
   nav a { padding: .28rem .4rem; }
+  .brand-logo img { height: 40px; max-width: 150px; }
   h1 { font-size: clamp(1.8rem, 8vw, 2.35rem); }
   .table-toolbar { flex-direction: column; align-items: stretch; }
   .table-search { max-width: 100%; }
