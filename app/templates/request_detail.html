@@ -1,0 +1,70 @@
+﻿{% extends "base.html" %}
+{% block content %}
+<main class="section admin-shell request-detail-page">
+  <div class="container">
+    <div class="admin-hero">
+      <div>
+        <p class="pill">Richiesta #{{ appointment['id'] }}</p>
+        <h1>{{ appointment['full_name'] }}</h1>
+        <p class="lead">{{ display_service_type(appointment['service_type']) }} - {{ status_label(appointment['status']) }} - {{ request_age_label(appointment) }} - {{ request_sla_label(appointment) }}</p>
+      </div>
+      <div class="actions compact">
+        <a class="btn ghost" href="{{ '/admin' if staff_mode == 'admin' else '/employee/dashboard' }}">Torna alla dashboard</a>
+        <a class="btn ghost" href="/appointments/{{ appointment['id'] }}/invite">Scarica invito calendario</a>
+      </div>
+    </div>
+
+    <section class="detail-grid">
+      <article class="card">
+        <h2>Cliente</h2>
+        <dl class="detail-list"><dt>Nome</dt><dd>{{ appointment['full_name'] }}</dd><dt>Email</dt><dd><a class="inline-link" href="mailto:{{ appointment['email'] }}">{{ appointment['email'] }}</a></dd><dt>Telefono</dt><dd>{{ appointment['phone'] }}</dd><dt>Data preferita</dt><dd>{{ appointment['preferred_date'] }}</dd></dl>
+        <div class="actions compact">
+          {% if whatsapp_link %}<a class="btn ghost small" href="{{ whatsapp_link }}" target="_blank" rel="noreferrer">Apri WhatsApp</a>{% else %}<span class="muted-note">Telefono non disponibile per WhatsApp.</span>{% endif %}
+          <button class="btn ghost small" type="button" data-copy-text="{{ whatsapp_text|e }}">Copia WhatsApp</button><span class="inline-feedback" data-copy-feedback></span>
+          <button class="btn ghost small" type="button" data-copy-text="{{ email_text|e }}">Copia email</button><span class="inline-feedback" data-copy-feedback></span>
+          <a class="btn ghost small" href="mailto:{{ appointment['email'] }}?subject=Aggiornamento richiesta ConsultIQ">Apri email</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Pratica e pagamento manuale</h2>
+        <dl class="detail-list"><dt>Servizio</dt><dd>{{ display_service_type(appointment['service_type']) }}</dd><dt>Area</dt><dd>{{ request_area_label(appointment['service_type']) }}</dd><dt>Priorita'</dt><dd><span class="priority-badge">{{ request_priority_label(appointment['priority']) }}</span></dd><dt>SLA</dt><dd><span class="sla-pill {{ request_sla_class(appointment) }}">{{ request_sla_label(appointment) }}</span></dd><dt>Operatore</dt><dd>{{ appointment['assigned_employee_name'] if appointment['assigned_employee_name'] else 'Non assegnata' }}</dd><dt>Pagamento</dt><dd>{{ payment_status_label(appointment['payment_status']) }}</dd></dl>
+      </article>
+    </section>
+
+    <section class="cards two">
+      <article class="card">
+        <h2>Controlli operativi</h2>
+        <form method="post" action="/admin/appointments/{{ appointment['id'] }}/status" class="status-form status-form--stack">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="next_url" value="{{ '/admin/requests/' ~ appointment['id'] if staff_mode == 'admin' else '/employee/requests/' ~ appointment['id'] }}">
+          <label>Stato pratica<select name="status">{% for s in request_statuses %}<option value="{{ s }}" {% if appointment['status']==s %}selected{% endif %}>{{ status_label(s) }}</option>{% endfor %}</select></label>
+          <label>Priorita'<select name="priority">{% for p in request_priorities %}<option value="{{ p }}" {% if appointment['priority']==p %}selected{% endif %}>{{ request_priority_label(p) }}</option>{% endfor %}</select></label>
+          {% if staff_mode == 'admin' %}<label>Assegna operatore<select name="assigned_employee_id"><option value="">Non assegnata</option>{% for emp in staff_members %}<option value="{{ emp['id'] }}" {% if appointment['assigned_employee_id'] == emp['id'] %}selected{% endif %}>{{ emp['full_name'] }} - {{ role_label(emp['role']) }}</option>{% endfor %}</select></label><label>Stato pagamento manuale<select name="payment_status">{% for p in payment_statuses %}<option value="{{ p }}" {% if appointment['payment_status']==p %}selected{% endif %}>{{ payment_status_label(p) }}</option>{% endfor %}</select></label><label>Metodo pagamento<input type="text" name="payment_method" value="{{ appointment['payment_method'] if 'payment_method' in appointment.keys() else '' }}" placeholder="Bonifico, contanti in sede, altro"></label><label>Importo richiesto<input type="text" name="requested_amount" value="{{ appointment['requested_amount'] if appointment['requested_amount'] else '' }}"></label><label>Riferimento pagamento<input type="text" name="payment_reference" value="{{ appointment['payment_reference'] if appointment['payment_reference'] else '' }}"></label><label>Istruzioni visibili al cliente<input type="text" name="payment_instruction" value="{{ appointment['payment_instruction'] if 'payment_instruction' in appointment.keys() else '' }}"></label><label>Nota pagamento interna<input type="text" name="payment_internal_note" value="{{ appointment['payment_internal_note'] if 'payment_internal_note' in appointment.keys() else '' }}"></label>{% endif %}
+          <label>Nota interna rapida<input type="text" name="internal_note" placeholder="Aggiungi una nota interna"></label>
+          <button class="btn primary small" type="submit">Salva aggiornamento</button>
+        </form>
+      </article>
+
+      <article class="card">
+        <h2>Checklist interna</h2>
+        <div class="progress-line"><span style="width: {{ checklist_progress.percent }}%"></span></div>
+        <p class="muted-note">{{ checklist_progress.done }} di {{ checklist_progress.total }} attivita' completate.</p>
+        <div class="checklist-list">{% for item in checklist_items %}<form method="post" action="/requests/{{ appointment['id'] }}/checklist/{{ item['id'] }}/toggle" class="checklist-row"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="next_url" value="{{ '/admin/requests/' ~ appointment['id'] if staff_mode == 'admin' else '/employee/requests/' ~ appointment['id'] }}"><input type="hidden" name="completed" value="{{ '0' if item['completed'] else '1' }}"><button class="check-button" type="submit">{{ 'Riapri' if item['completed'] else 'Completa' }}</button><span>{{ item['title'] }}</span><small>{{ 'Completata da ' ~ item['completed_by_name'] if item['completed'] and item['completed_by_name'] else 'Da completare' }}</small></form>{% else %}<p class="empty-state">Nessuna attivita' checklist. I template verranno creati automaticamente sulle nuove richieste.</p>{% endfor %}</div>
+        <form method="post" action="/requests/{{ appointment['id'] }}/checklist" class="inline-form"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="next_url" value="{{ '/admin/requests/' ~ appointment['id'] if staff_mode == 'admin' else '/employee/requests/' ~ appointment['id'] }}"><input type="text" name="title" placeholder="Nuova attivita' interna" required><button class="btn ghost small" type="submit">Aggiungi</button></form>
+      </article>
+    </section>
+
+    <section class="cards two">
+      <article class="card"><h2>Documenti richiesti</h2>{% for req in document_requirements %}<form method="post" action="/requests/{{ appointment['id'] }}/document-requirements/{{ req['id'] }}" class="document-row"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="next_url" value="{{ '/admin/requests/' ~ appointment['id'] if staff_mode == 'admin' else '/employee/requests/' ~ appointment['id'] }}"><strong>{{ req['title'] }}</strong><select name="status"><option value="missing" {% if req['status']=='missing' %}selected{% endif %}>Mancante</option><option value="requested" {% if req['status']=='requested' %}selected{% endif %}>Richiesto</option><option value="received" {% if req['status']=='received' %}selected{% endif %}>Ricevuto</option><option value="not_required" {% if req['status']=='not_required' %}selected{% endif %}>Non necessario</option></select><input type="text" name="note" value="{{ req['note'] }}" placeholder="Nota documento"><button class="btn ghost small" type="submit">Salva</button></form>{% else %}<p class="empty-state">Nessun requisito documento generato.</p>{% endfor %}</article>
+      <article class="card"><h2>Documenti caricati</h2>{% for d in documents %}<div class="document-row"><a class="inline-link" href="/documents/{{ d['id'] }}/download">{{ d['original_filename'] }}</a><span>{{ document_status_label(d['status']) }}</span><small>{{ d['category'] }} - {{ d['created_at'] }}</small></div>{% else %}<p class="empty-state">Nessun documento caricato.</p>{% endfor %}</article>
+    </section>
+
+    <section class="cards two">
+      <article class="card"><h2>Commenti e aggiornamenti</h2><form method="post" action="/requests/{{ appointment['id'] }}/comments" class="status-form status-form--stack"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="next_url" value="{{ '/admin/requests/' ~ appointment['id'] if staff_mode == 'admin' else '/employee/requests/' ~ appointment['id'] }}"><label>Visibilita'<select name="visibility"><option value="internal">Solo staff</option><option value="public">Visibile al cliente</option></select></label><label>Commento<textarea name="body" rows="3" placeholder="Scrivi nota interna o aggiornamento cliente" required></textarea></label><button class="btn primary small" type="submit">Aggiungi commento</button></form>{% for c in comments %}<div class="activity-row"><strong>{{ c['author_name'] if c['author_name'] else 'Staff' }} - {{ 'Interno' if c['is_internal'] else 'Cliente' }}</strong><span>{{ c['body'] }}</span><small>{{ c['created_at'] }}</small></div>{% else %}<p class="empty-state">Nessun commento ancora presente.</p>{% endfor %}</article>
+      <article class="card"><h2>Messaggi rapidi</h2><div class="actions compact"><button class="btn ghost small" type="button" data-copy-text="Gentile {{ appointment['full_name'] }}, la contattiamo da ConsultIQ per completare la pratica {{ display_service_type(appointment['service_type']) }}.">Primo contatto</button><button class="btn ghost small" type="button" data-copy-text="Gentile {{ appointment['full_name'] }}, per proseguire abbiamo bisogno dei documenti mancanti indicati nella sua area cliente.">Documenti mancanti</button><button class="btn ghost small" type="button" data-copy-text="Gentile {{ appointment['full_name'] }}, la sua pratica e' in lavorazione. La aggiorneremo appena possibile.">In lavorazione</button><button class="btn ghost small" type="button" data-copy-text="Gentile {{ appointment['full_name'] }}, la sua pratica risulta completata. Grazie per aver scelto ConsultIQ.">Completata</button><span class="inline-feedback" data-copy-feedback></span></div><p class="muted-note">I messaggi sono solo copiati: nessun invio automatico WhatsApp o email.</p><h3>Messaggio cliente</h3><p>{{ appointment['message'] if appointment['message'] else 'Nessun messaggio iniziale.' }}</p><h3>Note interne legacy</h3><pre class="notes-box">{{ appointment['internal_notes'] if appointment['internal_notes'] else 'Nessuna nota interna legacy.' }}</pre></article>
+    </section>
+
+    <section class="card"><h2>Cronologia richiesta</h2><div class="timeline">{% for event in timeline_events %}<div class="timeline-item"><strong>{{ event.label }}</strong><span>{{ event.detail }}</span><small>{{ event.created_at }}</small></div>{% else %}<p class="empty-state">Nessuna cronologia disponibile.</p>{% endfor %}</div></section>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container">
+    <nav class="breadcrumbs">
+      {% for label, href in breadcrumbs %}
+      <a href="{{ href }}">{{ label }}</a>{% if not loop.last %}<span>/</span>{% endif %}
+      {% endfor %}
+    </nav>
+  </div>
+  <div class="container split-detail">
+    <article class="card detail-main">
+      <p class="pill">Servizi Roma</p>
+      <div class="service-card-top">
+        <h1>{{ landing.title }}</h1>
+        <span class="meta">Consultiq Italy</span>
+      </div>
+      <p class="lead">{{ landing.description }}</p>
+      <p>{{ service.display_summary }} La sede ConsultIQ si trova in Via Licinio Murena 32-34, Roma - Metro A Numidio Quadrato, con operativita' anche per utenti delle zone Tuscolana, Appio, Cinecitta', Quadraro e Don Bosco.</p>
+      <h3>Documenti richiesti</h3>
+      <ul>
+        {% for d in service.documents %}
+        <li>{{ d }}</li>
+        {% endfor %}
+      </ul>
+      <h3>Domande frequenti</h3>
+      <div class="stack">
+        {% for question, answer in landing.faqs %}
+        <article class="tile-link"><strong>{{ question }}</strong><p>{{ answer }}</p></article>
+        {% endfor %}
+      </div>
+      <h3>Servizi collegati</h3>
+      <div class="stack">
+        {% for item in related %}
+        <a class="tile-link" href="/services/{{ item.slug }}">{{ item.display_title }}</a>
+        {% endfor %}
+      </div>
+    </article>
+    <aside class="card">
+      <h3>Richiedi assistenza</h3>
+      <p>Invia una richiesta per {{ landing.title }} oppure scrivici su WhatsApp per una prima verifica documentale. Ti contatteremo dopo il controllo preliminare.</p>
+      <div class="actions">
+        <a class="btn primary" href="/contact?service={{ service.category }} - {{ service.title }}">Invia richiesta</a>
+        <a class="btn ghost" href="{{ whatsapp_link }}" target="_blank" rel="noreferrer">WhatsApp</a>
+      </div>
+      <p class="meta">Indirizzo: Via Licinio Murena 32-34, Roma - Metro A Numidio Quadrato</p>
+    </aside>
+  </div>
+</main>
+{% endblock %}

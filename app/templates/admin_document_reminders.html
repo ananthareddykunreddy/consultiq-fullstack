@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section admin-shell">
+  <div class="container">
+    <div class="admin-hero">
+      <div><p class="pill">Scadenze documenti</p><h1>Promemoria documenti in scadenza</h1><p class="lead">Controlla i documenti con scadenza e crea promemoria email/coda notifiche senza invii WhatsApp automatici.</p></div>
+      <a class="btn ghost" href="/admin/launch-readiness">Prontezza lancio</a>
+    </div>
+    <div class="quick-filters">
+      <a class="chip {% if selected_days == 30 %}active{% endif %}" href="/admin/document-reminders?days=30">30 giorni</a>
+      <a class="chip {% if selected_days == 60 %}active{% endif %}" href="/admin/document-reminders?days=60">60 giorni</a>
+      <a class="chip {% if selected_days == 90 %}active{% endif %}" href="/admin/document-reminders?days=90">90 giorni</a>
+    </div>
+    <section class="card">
+      <div class="table-wrap compact-table">
+        <table>
+          <thead><tr><th>ID</th><th>Cliente</th><th>Pratica</th><th>Documento</th><th>Scadenza</th><th>Azione</th></tr></thead>
+          <tbody>
+            {% for d in documents %}
+            <tr>
+              <td>#{{ d['id'] }}</td>
+              <td>{{ d['full_name'] }}<small>{{ d['email'] }}</small></td>
+              <td>#{{ d['appointment_id'] }} {{ display_service_type(d['service_type']) }}</td>
+              <td>{{ d['original_filename'] }}</td>
+              <td>{{ d['expires_at'] }}</td>
+              <td><form method="post" action="/admin/document-reminders/{{ d['id'] }}/notify"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><input type="hidden" name="next_url" value="/admin/document-reminders?days={{ selected_days }}"><button class="btn warning small" type="submit">Crea promemoria</button></form></td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6">Nessun documento in scadenza nel periodo selezionato.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock %}

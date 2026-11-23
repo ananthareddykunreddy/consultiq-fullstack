@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container auth-wrap">
+    <div class="panel auth-panel">
+      <p class="pill">Verifica admin</p>
+      <h1>Conferma il codice 2FA</h1>
+      {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+      <form class="form plain" method="post" action="/admin-2fa-verify">
+        <label>Codice di autenticazione<input type="text" name="code" required></label>
+        <button class="btn primary" type="submit">Verifica</button>
+      </form>
+    </div>
+  </div>
+</main>
+{% endblock %}

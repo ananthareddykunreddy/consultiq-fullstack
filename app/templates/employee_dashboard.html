@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section admin-shell">
+  <div class="container">
+    <div class="admin-hero">
+      <div><p class="pill">Area operatore</p><h1>Dashboard operativa assegnata</h1><p class="lead">Gestisci solo le pratiche assegnate a te, con priorita', follow-up e checklist.</p></div>
+    </div>
+
+    <section class="kpi-grid compact-kpis">
+      <article class="kpi-card"><span>Assegnate</span><strong>{{ employee_kpis.assigned_total }}</strong></article>
+      <article class="kpi-card"><span>Nuove</span><strong>{{ employee_kpis.new_total }}</strong></article>
+      <article class="kpi-card"><span>In gestione</span><strong>{{ employee_kpis.working_total }}</strong></article>
+      <article class="kpi-card"><span>Urgenti</span><strong>{{ employee_kpis.urgent_total }}</strong></article>
+      <article class="kpi-card"><span>Follow-up oggi</span><strong>{{ employee_kpis.today_followups }}</strong></article>
+      <article class="kpi-card"><span>Completate settimana</span><strong>{{ employee_kpis.completed_week }}</strong></article>
+    </section>
+
+    <form class="card admin-filters" method="get" action="/employee/dashboard">
+      <input type="search" name="search" placeholder="Cerca nome, email, telefono, ID" value="{{ employee_filters.search }}">
+      <select name="status"><option value="">Tutti gli stati</option>{% for s in request_statuses %}<option value="{{ s }}" {% if employee_filters.status == s %}selected{% endif %}>{{ status_label(s) }}</option>{% endfor %}</select>
+      <select name="category"><option value="">Tutte le categorie</option>{% for c in service_categories %}<option value="{{ c }}" {% if employee_filters.category == c %}selected{% endif %}>{{ italian_service_category(c) }}</option>{% endfor %}</select>
+      <select name="service"><option value="">Tutti i servizi</option>{% for svc in services %}<option value="{{ svc.category }} - {{ svc.title }}" {% if employee_filters.service == svc.category ~ ' - ' ~ svc.title %}selected{% endif %}>{{ svc.display_category }} - {{ svc.display_title }}</option>{% endfor %}</select>
+      <select name="priority"><option value="">Tutte le priorita'</option>{% for p in request_priorities %}<option value="{{ p }}" {% if employee_filters.priority == p %}selected{% endif %}>{{ request_priority_label(p) }}</option>{% endfor %}</select>
+      <select name="payment_status"><option value="">Tutti i pagamenti</option>{% for p in payment_statuses %}<option value="{{ p }}" {% if employee_filters.payment_status == p %}selected{% endif %}>{{ payment_status_label(p) }}</option>{% endfor %}</select>
+      <input type="date" name="date_from" value="{{ employee_filters.date_from }}"><input type="date" name="date_to" value="{{ employee_filters.date_to }}">
+      <button class="btn primary small" type="submit">Filtra</button><a class="btn ghost small" href="/employee/dashboard">Reset</a>
+    </form>
+    <div class="quick-filters"><a class="chip" href="/employee/dashboard?quick_filter=urgent">Urgenti</a><a class="chip" href="/employee/dashboard?quick_filter=late">In ritardo</a><a class="chip" href="/employee/dashboard?quick_filter=waiting_client">In attesa cliente</a><a class="chip" href="/employee/dashboard?quick_filter=call_today">Da richiamare oggi</a><a class="chip" href="/employee/dashboard?quick_filter=payment_check">Pagamento da verificare</a></div>
+
+    <section class="cards two">
+      <article class="card"><h2>Priorita' assegnate</h2>{% for a in priority_requests %}<a class="request-mini {{ request_sla_class(a) }}" href="/employee/requests/{{ a['id'] }}"><strong>#{{ a['id'] }} {{ a['full_name'] }}</strong><span>{{ display_service_type(a['service_type']) }}</span><small>{{ request_age_label(a) }}</small></a>{% else %}<p class="empty-state">Nessuna richiesta urgente assegnata.</p>{% endfor %}</article>
+      <article class="card"><h2>Documenti recenti</h2>{% for d in documents[:8] %}<div class="document-row"><strong>#{{ d['appointment_id'] }}</strong><span>{{ d['original_filename'] }}</span><small>{{ document_status_label(d['status']) }} - {{ d['category'] }}</small></div>{% else %}<p class="empty-state">Nessun documento recente sulle tue pratiche.</p>{% endfor %}</article>
+    </section>
+
+    <section class="card"><h2>Le tue richieste</h2>
+      <div class="request-card-grid">
+        {% for a in appointments %}
+        {% set progress = checklist_counts.get(a['id'], {'total': 0, 'done': 0, 'percent': 0}) %}
+        <article class="request-card {{ request_sla_class(a) }}"><div class="request-card-head"><span class="request-id-plain">{{ a['id'] }}</span><strong>#{{ a['id'] }} {{ a['full_name'] }}</strong><span class="priority-badge">{{ request_priority_label(a['priority']) }}</span></div><p>{{ display_service_type(a['service_type']) }}</p><small>{{ status_label(a['status']) }} - {{ request_age_label(a) }}</small><div class="progress-line"><span style="width: {{ progress.percent }}%"></span></div><small>Checklist {{ progress.done }}/{{ progress.total }}</small><div class="actions compact"><a class="btn ghost small" href="/employee/requests/{{ a['id'] }}">Apri richiesta</a><a class="btn ghost small" href="/appointments/{{ a['id'] }}/invite">Invito</a></div></article>
+        {% else %}<p class="empty-state">Nessuna richiesta assegnata per i filtri selezionati.</p>{% endfor %}
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock %}
+
+

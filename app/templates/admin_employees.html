@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section admin-shell">
+  <div class="container">
+    <p class="pill">Gestione team</p>
+    <h1>Operatori e responsabili</h1>
+    <div class="split-detail">
+      <section class="card">
+        <h3>Crea nuovo operatore</h3>
+        <form class="form plain" method="post" action="/admin/employees">
+          <label>Nome e cognome<input type="text" name="full_name" required></label>
+          <label>Email<input type="email" name="email" required></label>
+          <label>Telefono<input type="text" name="phone"></label>
+          <label>Ruolo<select name="role"><option value="employee">Operatore</option><option value="manager">Responsabile</option></select></label>
+          <label>Password provvisoria<input type="text" name="password" required></label>
+          <button class="btn primary" type="submit">Crea account</button>
+        </form>
+      </section>
+      <section class="card">
+        <h3>Panoramica staff</h3>
+        <p class="lead">Usa questa sezione per creare operatori, attivare o disattivare account interni e controllare il carico di richieste.</p>
+      </section>
+    </div>
+    <div class="table-wrap card">
+      <table data-smart-table="employees">
+        <thead><tr><th data-sort>ID</th><th data-sort>Nome</th><th data-sort>Email</th><th data-sort>Ruolo</th><th data-sort>Stato</th><th data-sort>Assegnate</th><th data-sort>Aperte</th><th>Azione</th></tr></thead>
+        <tbody>
+          {% for row in employee_rows %}
+          <tr>
+            <td>{{ row.employee['id'] }}</td>
+            <td>{{ row.employee['full_name'] }}</td>
+            <td>{{ row.employee['email'] }}</td>
+            <td>{{ role_label(row.employee['role']) }}</td>
+            <td>{{ 'Attivo' if row.employee['active'] else 'Disattivato' }}</td>
+            <td>{{ row.assigned_total }}</td>
+            <td>{{ row.open_total }}</td>
+            <td><form method="post" action="/admin/employees/{{ row.employee['id'] }}/toggle"><button class="btn ghost small" type="submit">{{ 'Disattiva' if row.employee['active'] else 'Riattiva' }}</button></form></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="8">Nessun operatore disponibile.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container">
+    <nav class="breadcrumbs">
+      {% for label, href in breadcrumbs %}
+      <a href="{{ href }}">{{ label }}</a>{% if not loop.last %}<span>/</span>{% endif %}
+      {% endfor %}
+    </nav>
+  </div>
+  <div class="container split-detail">
+    <article class="card detail-main">
+      <p class="pill">{{ service.display_category }}</p>
+      <div class="service-card-top">
+        <h1>{{ service.display_title }}</h1>
+        <span class="meta">Pratica su richiesta</span>
+      </div>
+      <p class="lead">{{ service.display_summary }}</p>
+      <p class="meta">Sede operativa: Via Licinio Murena 32-34, Roma - Metro A Numidio Quadrato</p>
+      <h3>Come funziona</h3>
+      <p>Invia la richiesta online con i tuoi recapiti e una breve descrizione. Il team ConsultIQ controlla i documenti disponibili, ti indica eventuali integrazioni e ti contatta per i prossimi passaggi operativi.</p>
+      <h3>Documenti richiesti</h3>
+      <ul>
+        {% for d in service.documents %}
+        <li>{{ d }}</li>
+        {% endfor %}
+      </ul>
+      <div class="actions">
+        <a class="btn ghost" href="/required-documents">Checklist completa</a>
+        <a class="btn ghost" href="{{ whatsapp_link }}" target="_blank" rel="noreferrer">WhatsApp servizio</a>
+      </div>
+    </article>
+    <aside class="card">
+      <h3>Invia richiesta per questo servizio</h3>
+      <p class="muted-note">Ti contatteremo per confermare documenti, tempistiche e modalita' operative. Nessun pagamento online e' richiesto dal sito.</p>
+      {% if booked %}<div class="flash success">Richiesta inviata correttamente.</div>{% endif %}
+      <form class="form plain" method="post" action="/services/{{ service.slug }}/book" enctype="multipart/form-data">
+        <label>Nome e cognome<input type="text" name="full_name" value="{{ user.full_name if user else '' }}" required></label>
+        <label>Email<input type="email" name="email" value="{{ user.email if user else '' }}" required></label>
+        <label>Telefono<input type="text" name="phone" value="{{ user.phone if user and user.phone else '' }}" required></label>
+        <label>Dettagli pratica<textarea name="message" rows="4" placeholder="Descrivi la tua esigenza, i documenti disponibili e l'eventuale urgenza"></textarea></label>
+        <label>Allega documento (opzionale)<input type="file" name="document"></label>
+        <label class="consent-check"><input type="checkbox" name="privacy_accept" value="1" required><span>Ho letto e accetto l'Informativa Privacy</span></label>
+        <label class="consent-check"><input type="checkbox" name="terms_accept" value="1" required><span>Accetto i Termini e Condizioni del servizio</span></label>
+        <label class="consent-check"><input type="checkbox" name="marketing_accept" value="1"><span>Acconsento a ricevere comunicazioni informative e promozionali</span></label>
+        <button class="btn primary" type="submit">Invia richiesta</button>
+      </form>
+      <h3>Servizi correlati</h3>
+      <div class="stack">
+        {% for r in related %}
+        <a class="tile-link" href="/services/{{ r.slug }}">{{ r.display_title }} <span class="meta">{{ r.display_category }}</span></a>
+        {% else %}
+        <p>Nessun servizio correlato disponibile.</p>
+        {% endfor %}
+      </div>
+    </aside>
+  </div>
+</main>
+{% endblock %}

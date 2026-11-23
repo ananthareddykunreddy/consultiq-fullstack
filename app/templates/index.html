@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<main>
+  <section class="home-intro">
+    <div class="container home-intro-shell">
+      <div>
+        <p class="pill">CAF, Patronato e Servizi al Cittadino</p>
+        <h1>Soluzioni semplici per le tue pratiche</h1>
+        <p class="lead">Gestire documenti e scadenze non deve essere un problema. Il team ConsultIQ semplifica pratiche fiscali, previdenziali, di immigrazione e avvio impresa con una presa in carico chiara, operativa e prudente.</p>
+        <div class="actions">
+          <a class="btn primary" href="/services">Esplora i servizi</a>
+          <a class="btn ghost" href="/contact">Invia una richiesta</a>
+        </div>
+      </div>
+      <aside class="home-contact-strip">
+        <strong>Consultiq Italy</strong>
+        <span>Via Licinio Murena 32-34, Roma</span>
+        <span>Metro A - Numidio Quadrato</span>
+        <a href="tel:+390697616812">0697616812</a>
+      </aside>
+    </div>
+  </section>
+  <section class="section">
+    <div class="container home-service-grid">
+      {% for service in featured_services %}
+      <article class="home-service-card {% if loop.last %}home-service-card-accent{% endif %}">
+        <div class="service-card-top"><h3>{{ service.display_title }}</h3><span class="meta">{{ service.display_category }}</span></div>
+        <p>{{ service.display_summary }}</p>
+        <a class="inline-link" href="/services/{{ service.slug }}">Scopri di piu'</a>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  <section class="section home-updates">
+    <div class="container home-updates-shell">
+      <p class="pill">Ultimi aggiornamenti</p>
+      <div class="update-tags" aria-label="Ultimi aggiornamenti">
+        <a href="/services/caf-bonus">Bonus</a>
+        <a href="/services/caf-730">730</a>
+        <a href="/services/caf-isee">ISEE</a>
+        <a href="/services/business-partita-iva">Partita IVA</a>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

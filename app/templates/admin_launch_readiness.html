@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section admin-shell">
+  <div class="container">
+    <div class="admin-hero">
+      <div>
+        <p class="pill">Prontezza lancio</p>
+        <h1>Checklist produzione ConsultIQ</h1>
+        <p class="lead">Controlli operativi per pubblicare il portale su hosting Linux/cPanel con GitHub, backup e sicurezza di base.</p>
+      </div>
+      <div class="actions compact">
+        <a class="btn ghost" href="/admin/permissions">Permessi ruoli</a>
+        <a class="btn ghost" href="/admin/document-reminders">Scadenze documenti</a>
+        <a class="btn ghost" href="/admin/audit/export">Esporta audit CSV</a>
+      </div>
+    </div>
+    {% if smtp_warning %}<div class="flash error">SMTP non configurato: le email restano in coda finche' non completi le variabili ambiente.</div>{% endif %}
+    <section class="cards two">
+      <article class="card">
+        <h2>Checklist go-live</h2>
+        <div class="stack">
+          {% for item in checklist %}
+          <div class="activity-row"><strong>{{ item.title }}</strong><span>{{ item.detail }}</span><small>{{ item.status }}</small></div>
+          {% endfor %}
+        </div>
+      </article>
+      <article class="card">
+        <h2>Deploy da GitHub a hosting Linux</h2>
+        <ol class="launch-list">{% for step in deploy_steps %}<li>{{ step }}</li>{% endfor %}</ol>
+        <h3>Backup da proteggere</h3>
+        <div class="stack">{% for item in backup_paths %}<p><strong>{{ item.label }}</strong><br><span class="muted-note">{{ item.path }}</span></p>{% endfor %}</div>
+      </article>
+    </section>
+    <section class="cards two">
+      <article class="card">
+        <h2>Stato migrazioni SQLite</h2>
+        <div class="table-wrap compact-table"><table><thead><tr><th>Elemento</th><th>Stato</th></tr></thead><tbody>{% for row in migration_rows %}<tr><td>{{ row.name }}</td><td><span class="status-badge">{{ row.status }}</span></td></tr>{% endfor %}</tbody></table></div>
+      </article>
+      <article class="card">
+        <h2>Privacy, cookie e legale</h2>
+        <ol class="launch-list">{% for step in legal_steps %}<li>{{ step }}</li>{% endfor %}</ol>
+        <p class="muted-note">Questa pagina non sostituisce una revisione legale: serve come promemoria operativo prima della pubblicazione.</p>
+      </article>
+    </section>
+  </div>
+</main>
+{% endblock %}

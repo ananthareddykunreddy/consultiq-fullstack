@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container auth-wrap">
+    <div class="panel auth-panel">
+      <p class="pill">Accesso cliente</p>
+      <h1>Entra nella tua area riservata</h1>
+      <p class="lead">Consulta appuntamenti, documenti caricati e aggiornamenti operativi della tua pratica.</p>
+      {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+      <form class="form plain" method="post" action="/login">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Email<input type="email" name="email" required></label>
+        <label>Password<input type="password" name="password" required></label>
+        <button class="btn primary" type="submit">Accedi</button>
+      </form>
+      <p>Non hai ancora un account? <a class="inline-link" href="/register">Registrati</a></p>
+      <p><a class="inline-link" href="/password-reset-request">Hai dimenticato la password?</a></p>
+    </div>
+  </div>
+</main>
+{% endblock %}

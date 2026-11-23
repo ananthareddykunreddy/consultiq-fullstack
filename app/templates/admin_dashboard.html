@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section admin-shell">
+  <div class="container">
+    <div class="admin-hero crm-hero">
+      <div>
+        <p class="pill light">Centro controllo admin</p><h1>Dashboard CRM ConsultIQ</h1><p class="lead">Una vista moderna per priorita', SLA, operatori, documenti e avanzamento pratiche.</p><div class="hero-metrics"><span>{{ admin_kpis.appointments_total }} richieste filtrate</span><span>{{ admin_kpis.sla_compliance }}% SLA nei tempi</span><span>{{ admin_kpis.unassigned_total }} da assegnare</span></div>
+      </div>
+      <div class="actions compact">
+        <a class="btn ghost" href="/admin/calendar">Calendario</a>
+        <a class="btn ghost" href="/admin/analytics">Analytics</a>
+        <a class="btn ghost" href="/admin/employees">Operatori</a><a class="btn ghost" href="/admin/team-performance">Performance team</a><a class="btn ghost" href="/staff/notifications">Notifiche</a>
+        <a class="btn ghost" href="/admin/launch-readiness">Prontezza lancio</a><a class="btn ghost" href="/admin/document-reminders">Scadenze documenti</a>
+        <a class="btn ghost" href="/admin/2fa/setup">2FA admin</a>
+      </div>
+    </div>
+    {% if smtp_warning %}<div class="flash error">SMTP non configurato. Le email restano in coda finche' non imposti le variabili ambiente corrette.</div>{% endif %}
+
+    <section class="kpi-grid compact-kpis">
+      <article class="kpi-card kpi-blue"><span>Richieste filtrate</span><strong>{{ admin_kpis.appointments_total }}</strong></article>
+      <article class="kpi-card kpi-indigo"><span>Nuove</span><strong>{{ admin_kpis.new_total }}</strong></article>
+      <article class="kpi-card kpi-purple"><span>In lavorazione</span><strong>{{ admin_kpis.in_progress_total }}</strong></article>
+      <article class="kpi-card kpi-red"><span>Urgenti</span><strong>{{ admin_kpis.urgent_total }}</strong></article>
+      <article class="kpi-card kpi-indigo"><span>Non assegnate</span><strong>{{ admin_kpis.unassigned_total }}</strong></article>
+      <article class="kpi-card kpi-teal"><span>Documenti mancanti</span><strong>{{ admin_kpis.missing_documents }}</strong></article>
+      <article class="kpi-card kpi-yellow"><span>Verifiche manuali mese</span><strong>{{ admin_kpis.revenue_this_month }}</strong></article>
+      <article class="kpi-card kpi-orange"><span>In ritardo</span><strong>{{ admin_kpis.overdue_total }}</strong></article><article class="kpi-card kpi-green"><span>SLA nei tempi</span><strong>{{ admin_kpis.sla_compliance }}%</strong></article>
+    </section>
+
+    <form class="card admin-filters" method="get" action="/admin">
+      <input type="search" name="search" placeholder="Cerca nome, email, telefono, ID" value="{{ admin_filters.search }}">
+      <select name="status"><option value="">Tutti gli stati</option>{% for s in request_statuses %}<option value="{{ s }}" {% if admin_filters.status == s %}selected{% endif %}>{{ status_label(s) }}</option>{% endfor %}</select>
+      <select name="category"><option value="">Tutte le categorie</option>{% for c in service_categories %}<option value="{{ c }}" {% if admin_filters.category == c %}selected{% endif %}>{{ italian_service_category(c) }}</option>{% endfor %}</select>
+      <select name="service"><option value="">Tutti i servizi</option>{% for svc in services %}<option value="{{ svc.category }} - {{ svc.title }}" {% if admin_filters.service == svc.category ~ ' - ' ~ svc.title %}selected{% endif %}>{{ svc.display_category }} - {{ svc.display_title }}</option>{% endfor %}</select>
+      <select name="assigned_employee_id"><option value="">Tutti gli operatori</option><option value="none" {% if admin_filters.assigned_employee_id == 'none' %}selected{% endif %}>Non assegnate</option>{% for emp in active_employees %}<option value="{{ emp['id'] }}" {% if admin_filters.assigned_employee_id == emp['id']|string %}selected{% endif %}>{{ emp['full_name'] }}</option>{% endfor %}</select>
+      <select name="priority"><option value="">Tutte le priorita'</option>{% for p in request_priorities %}<option value="{{ p }}" {% if admin_filters.priority == p %}selected{% endif %}>{{ request_priority_label(p) }}</option>{% endfor %}</select>
+      <select name="payment_status"><option value="">Tutti i pagamenti</option>{% for p in payment_statuses %}<option value="{{ p }}" {% if admin_filters.payment_status == p %}selected{% endif %}>{{ payment_status_label(p) }}</option>{% endfor %}</select>
+      <input type="date" name="date_from" value="{{ admin_filters.date_from }}">
+      <input type="date" name="date_to" value="{{ admin_filters.date_to }}">
+      <button class="btn primary small" type="submit">Filtra</button>
+      <a class="btn ghost small" href="/admin">Reset</a>
+    </form>
+    <div class="quick-filters">
+      <a class="chip {% if admin_filters.quick_filter == 'unassigned' %}active{% endif %}" href="/admin?quick_filter=unassigned">Da assegnare</a>
+      <a class="chip {% if admin_filters.quick_filter == 'urgent' %}active{% endif %}" href="/admin?quick_filter=urgent">Urgenti</a>
+      <a class="chip {% if admin_filters.quick_filter == 'late' %}active{% endif %}" href="/admin?quick_filter=late">In ritardo</a>
+      <a class="chip {% if admin_filters.quick_filter == 'waiting_client' %}active{% endif %}" href="/admin?quick_filter=waiting_client">In attesa cliente</a>
+      <a class="chip {% if admin_filters.quick_filter == 'call_today' %}active{% endif %}" href="/admin?quick_filter=call_today">Da richiamare oggi</a>
+      <a class="chip {% if admin_filters.quick_filter == 'missing_documents' %}active{% endif %}" href="/admin?quick_filter=missing_documents">Documenti mancanti</a><a class="chip {% if admin_filters.quick_filter == 'payment_check' %}active{% endif %}" href="/admin?quick_filter=payment_check">Pagamento da verificare</a>
+      <a class="chip" href="/admin/audit/export">Esporta audit</a>
+    </div>
+
+    <nav class="tab-strip" aria-label="Sezioni dashboard">
+      <a href="#panoramica">Panoramica</a><a href="#nuove">Nuove richieste</a><a href="#non-assegnate">Non assegnate</a><a href="#lavorazione">In lavorazione</a><a href="#completate">Completate</a><a href="#documenti">Documenti</a><a href="#audit">Registro attivita'</a>
+    </nav>
+
+    <section id="panoramica" class="dashboard-grid">
+      <article class="card priority-panel">
+        <h2>Da gestire oggi</h2>
+        {% for item in today_priority %}
+        <a class="request-mini {{ request_sla_class(item) }}" href="/admin/requests/{{ item['id'] }}"><strong>#{{ item['id'] }} {{ item['full_name'] }}</strong><span>{{ display_service_type(item['service_type']) }}</span><small>{{ request_priority_label(item['priority']) }} - {{ request_age_label(item) }}</small></a>
+        {% else %}<p class="empty-state">Nessuna priorita' critica in evidenza.</p>{% endfor %}
+      </article>
+      <article class="card">
+        <h2>Richieste non assegnate</h2>
+        {% for item in unassigned_requests %}<a class="request-mini {{ request_sla_class(item) }}" href="/admin/requests/{{ item['id'] }}"><strong>#{{ item['id'] }} {{ item['full_name'] }}</strong><span>{{ display_service_type(item['service_type']) }}</span><small>{{ request_age_label(item) }}</small></a>{% else %}<p class="empty-state">Tutte le richieste aperte sono assegnate.</p>{% endfor %}
+        <form method="post" action="/admin/requests/auto-assign" class="actions compact"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><button class="btn secondary small" type="submit">Auto-assegna al team</button></form>
+      </article>
+      <article class="card workload-panel">
+        <h2>Carico operatori</h2>
+        {% for row in employee_workload %}
+        <div class="workload-row {% if row.overloaded %}is-warning{% endif %}"><span>{{ row.employee['full_name'] }}</span><strong>{{ row.open }} aperte</strong><small>{{ row.assigned }} totali - {{ row.completed_week }} completate questa settimana{% if row.overloaded %} - Sovraccarico{% endif %}</small></div>
+        {% else %}<p class="empty-state">Nessun operatore attivo.</p>{% endfor %}
+      </article>
+      <article class="card recent-panel">
+        <h2>Attivita' recenti</h2>
+        {% for a in recent_activity %}<div class="activity-row"><strong>{{ audit_action_label(a['action']) }}</strong><span>{{ audit_target_label(a['target_type']) }} #{{ a['target_id'] }} - {{ audit_detail_label(a['details']) }}</span><small>{{ a['actor'] if a['actor'] else 'Sistema' }} - {{ a['created_at'] }}</small></div>{% else %}<p class="empty-state">Nessuna attivita' registrata.</p>{% endfor %}
+      </article>
+    </section>
+
+    <details class="card section-toggle crm-pipeline" open><summary>Pipeline richieste</summary>
+      <div class="kanban-board">
+        {% for column in request_board %}
+        <section class="kanban-column"><h3>{{ column['label'] }} <span>{{ column['items']|length }}</span></h3>
+          {% for a in column['items'][:8] %}
+          <article class="kanban-card {{ request_sla_class(a) }}"><div class="kanban-top"><strong>#{{ a['id'] }}</strong><span class="priority-badge">{{ request_priority_label(a['priority']) }}</span></div><h4>{{ a['full_name'] }}</h4><p>{{ display_service_type(a['service_type']) }}</p><small>{{ a['assigned_employee_name'] if a['assigned_employee_name'] else 'Non assegnata' }} - {{ request_age_label(a) }}</small><a class="btn ghost small" href="/admin/requests/{{ a['id'] }}">Apri</a></article>
+          {% else %}<p class="empty-state small">Nessuna richiesta.</p>{% endfor %}
+        </section>
+        {% endfor %}
+      </div>
+    </details>
+
+    {% set tab_sets = [('nuove','Nuove richieste'),('non-assegnate','Non assegnate'),('lavorazione','In lavorazione'),('completate','Completate')] %}
+    {% for section_id, section_title in tab_sets %}
+    <details id="{{ section_id }}" class="card section-toggle"><summary>{{ section_title }}</summary><p class="muted-note">Mostrate le ultime {{ dashboard_section_limit }} richieste per questa sezione. Usa i filtri per restringere la ricerca.</p>
+      <div class="desktop-table compact-table"><table data-smart-table="admin-{{ section_id }}"><thead><tr><th>ID</th><th>Cliente</th><th>Servizio</th><th>Stato</th><th>Priorita'</th><th>Operatore</th><th>Pagamento</th><th>Azioni</th></tr></thead><tbody>
+      {% for a in admin_sections[section_id] %}<tr><td>#{{ a['id'] }}</td><td>{{ a['full_name'] }}<small>{{ a['email'] }}</small></td><td>{{ display_service_type(a['service_type']) }}</td><td><span class="status-badge">{{ status_label(a['status']) }}</span></td><td><span class="priority-badge">{{ request_priority_label(a['priority']) }}</span></td><td>{{ a['assigned_employee_name'] if a['assigned_employee_name'] else 'Non assegnata' }}</td><td>{{ payment_status_label(a['payment_status']) }}</td><td><a class="btn ghost small" href="/admin/requests/{{ a['id'] }}">Apri</a></td></tr>{% else %}<tr><td colspan="8">Nessun elemento in questa sezione.</td></tr>{% endfor %}
+      </tbody></table></div>
+      <div class="mobile-request-list">{% for a in admin_sections[section_id] %}<article class="request-card {{ request_sla_class(a) }}"><div><strong>#{{ a['id'] }} {{ a['full_name'] }}</strong><span class="priority-badge">{{ request_priority_label(a['priority']) }}</span></div><p>{{ display_service_type(a['service_type']) }}</p><small>{{ status_label(a['status']) }} - {{ a['assigned_employee_name'] if a['assigned_employee_name'] else 'Non assegnata' }}</small><a class="btn ghost small" href="/admin/requests/{{ a['id'] }}">Apri richiesta</a></article>{% else %}<p class="empty-state">Nessun elemento in questa sezione.</p>{% endfor %}</div>
+    </details>
+    {% endfor %}
+
+    <details id="documenti" class="card section-toggle"><summary>Documenti</summary><p class="muted-note">Anteprima degli ultimi {{ dashboard_document_limit }} documenti caricati.</p>
+      <div class="table-wrap compact-table"><table data-smart-table="adminDocs"><thead><tr><th>ID</th><th>Richiesta</th><th>File</th><th>Stato</th><th>Categoria</th><th>Scadenza</th><th>Aggiorna</th></tr></thead><tbody>{% for d in documents %}<tr><td>{{ d['id'] }}</td><td>#{{ d['appointment_id'] }}</td><td><a class="inline-link" href="/documents/{{ d['id'] }}/download">{{ d['original_filename'] }}</a><small>{{ scan_status_label(d['scan_status']) }}</small></td><td>{{ document_status_label(d['status']) }}</td><td>{{ d['category'] }}</td><td>{{ d['expires_at'] if d['expires_at'] else '-' }}</td><td><form method="post" action="/admin/documents/{{ d['id'] }}/update" class="upload-form upload-form--stack"><input type="hidden" name="csrf_token" value="{{ csrf_token }}"><select name="status">{% for s in document_statuses %}<option value="{{ s }}" {% if d['status']==s %}selected{% endif %}>{{ document_status_label(s) }}</option>{% endfor %}</select><select name="category">{% for c in document_categories %}<option value="{{ c }}" {% if d['category']==c %}selected{% endif %}>{{ c }}</option>{% endfor %}</select><input type="date" name="expires_at" value="{{ d['expires_at'] if d['expires_at'] else '' }}"><input type="text" name="client_note" value="{{ d['client_note'] if d['client_note'] else '' }}" placeholder="Nota visibile al cliente"><button class="btn ghost small" type="submit">Salva</button></form></td></tr>{% else %}<tr><td colspan="7">Nessun file caricato.</td></tr>{% endfor %}</tbody></table></div>
+    </details>
+
+    <details id="audit" class="card section-toggle"><summary>Registro attivita'</summary><p class="muted-note">Mostrate le ultime {{ dashboard_audit_limit }} attivita'.</p>
+      <div class="table-wrap compact-table"><table data-smart-table="adminAudit"><thead><tr><th>ID</th><th>Operatore</th><th>Azione</th><th>Target</th><th>Dettagli</th><th>Creato</th></tr></thead><tbody>{% for a in audit_logs %}<tr><td>{{ a['id'] }}</td><td>{{ a['actor'] if a['actor'] else '-' }}</td><td>{{ audit_action_label(a['action']) }}</td><td>{{ audit_target_label(a['target_type']) }} #{{ a['target_id'] }}</td><td>{{ audit_detail_label(a['details']) }}</td><td>{{ a['created_at'] }}</td></tr>{% else %}<tr><td colspan="6">Nessuna riga audit.</td></tr>{% endfor %}</tbody></table></div>
+    </details>
+  </div>
+</main>
+{% endblock %}
+
+
+

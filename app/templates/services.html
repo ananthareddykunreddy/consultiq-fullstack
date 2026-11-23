@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container">
+    <p class="pill">Portafoglio servizi</p>
+    <h1>Tutti i servizi ConsultIQ</h1>
+    <p class="lead">Servizi amministrativi e documentali per cittadini, famiglie, lavoratori e imprese a Roma. Inviaci una richiesta: il team verifica documenti, tempi e prossimi passaggi prima di confermare la presa in carico.</p>
+    {% for category in service_categories %}
+    <section class="service-category">
+      <div class="service-category-head">
+        <h2>{{ grouped_services[category][0].display_category if grouped_services[category] else category }}</h2>
+        <span>{{ grouped_services[category] | length }} servizi</span>
+      </div>
+      <div class="cards three">
+        {% for s in grouped_services[category] %}
+        <article class="card service-card">
+          <div class="service-card-top">
+            <p class="meta">{{ s.display_category }}</p>
+            <span class="service-icon">{{ s.category_icon | upper }}</span>
+          </div>
+          <h3>{{ s.display_title }}</h3>
+          <p>{{ s.display_summary }}</p>
+          <ul class="service-doc-preview">
+            {% for doc in s.documents[:3] %}
+            <li>{{ doc }}</li>
+            {% endfor %}
+          </ul>
+          <div class="actions compact">
+            <a class="btn ghost" href="/services/{{ s.slug }}">Dettagli</a>
+            <a class="btn primary" href="/contact?service={{ s.category }} - {{ s.title }}">Richiedi assistenza</a>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+    <section class="service-category">
+      <div class="service-category-head">
+        <h2>Servizi locali Roma</h2>
+        <span>Landing informative dedicate</span>
+      </div>
+      <div class="cards three">
+        {% for seo in seo_links %}
+        <article class="card">
+          <h3>{{ seo.title }}</h3>
+          <p>Pagina dedicata con riferimenti locali Roma, FAQ e call to action rapide.</p>
+          <a class="btn ghost" href="/servizi/{{ seo.slug }}">Apri pagina</a>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</main>
+{% endblock %}

@@ -1,0 +1,7 @@
+﻿deployment:
+  tasks:
+    - export DEPLOYPATH=/home/$USER/consultiq-fullstack
+    - /bin/mkdir -p $DEPLOYPATH
+    - /bin/cp -R . $DEPLOYPATH
+    - /bin/mkdir -p $DEPLOYPATH/app/data/uploads
+    - /bin/chmod -R 755 $DEPLOYPATH/app/data

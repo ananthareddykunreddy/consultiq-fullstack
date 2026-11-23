@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container auth-wrap">
+    <div class="panel auth-panel">
+      <p class="pill">Registrazione cliente</p>
+      <h1>Crea il tuo account ConsultIQ</h1>
+      <p class="lead">Con l'area cliente puoi seguire la pratica, caricare documenti e scaricare l'invito calendario.</p>
+      {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+      <form class="form plain" method="post" action="/register">
+        <label>Nome e cognome<input type="text" name="full_name" required></label>
+        <label>Email<input type="email" name="email" required></label>
+        <label>Telefono<input type="text" name="phone" placeholder="Es. 344 488 1606"></label>
+        <label>Password<input type="password" name="password" required></label>
+        <button class="btn primary" type="submit">Registrati</button>
+      </form>
+      <p>Hai gia' un account? <a class="inline-link" href="/login">Accedi</a></p>
+    </div>
+  </div>
+</main>
+{% endblock %}

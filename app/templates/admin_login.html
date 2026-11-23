@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container auth-wrap">
+    <div class="panel auth-panel">
+      <p class="pill">Accesso staff</p>
+      <h1>Entra nell'area operativa</h1>
+      <p class="lead">Area riservata per amministratori, responsabili e operatori che gestiscono richieste, documenti e attivita' interne.</p>
+      {% if error %}<div class="flash error">{{ error }}</div>{% endif %}
+      <form class="form plain" method="post" action="/admin-login">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label>Email<input type="email" name="email" required></label>
+        <label>Password<input type="password" name="password" required></label>
+        <button class="btn primary" type="submit">Accedi come staff</button>
+      </form>
+      <p><a class="inline-link" href="/admin/2fa/setup">Configura o aggiorna 2FA dopo l'accesso</a></p>
+    </div>
+  </div>
+</main>
+{% endblock %}

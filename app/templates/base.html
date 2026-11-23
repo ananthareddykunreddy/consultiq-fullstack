@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title }}</title>
+  <meta name="description" content="{{ meta_description if meta_description else 'Consultiq Italy: servizi CAF, Patronato, immigrazione e supporto pratiche a Roma.' }}" />
+  <meta property="og:title" content="{{ title }}" />
+  <meta property="og:description" content="{{ og_description if og_description else meta_description if meta_description else 'Consultiq Italy: supporto CAF, Patronato, immigrazione e servizi a Roma.' }}" />
+  <meta property="og:type" content="website" />
+  <meta name="csrf-token" content="{{ csrf_token }}" />
+  <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body class="{% if page == 'admin' and user and user.role in ['admin', 'manager', 'employee'] %}backoffice-body{% endif %}">
+  {% set is_staff_area = page == 'admin' and user and user.role in ['admin', 'manager', 'employee'] %}
+  {% if is_staff_area %}
+  <div class="backoffice-layout">
+    <aside class="backoffice-sidebar" aria-label="Navigazione area staff">
+      <a class="backoffice-brand" href="{{ '/admin' if user.role in ['admin', 'manager'] else '/employee/dashboard' }}">
+        <img src="/static/consultiq-logo.svg" alt="ConsultIQ">
+        <span><strong>ConsultIQ</strong><small>{{ 'Admin' if user.role in ['admin', 'manager'] else 'Area Staff' }}</small></span>
+      </a>
+      <nav class="backoffice-nav">
+        {% if user.role in ['admin', 'manager'] %}
+        <a class="{% if request.url.path == '/admin' %}active{% endif %}" href="/admin">Dashboard</a>
+        <a href="/admin#nuove">Richieste</a>
+        <a class="{% if request.url.path == '/admin/employees' %}active{% endif %}" href="/admin/employees">Operatori</a>
+        <a class="{% if request.url.path == '/admin/team-performance' %}active{% endif %}" href="/admin/team-performance">Performance Team</a>
+        <a class="{% if request.url.path == '/staff/notifications' %}active{% endif %}" href="/staff/notifications">Notifiche</a>
+        <a class="{% if request.url.path == '/admin/analytics' %}active{% endif %}" href="/admin/analytics">Analytics</a>
+        <a href="/admin#documenti">Documenti</a>
+        <a class="{% if request.url.path == '/admin/permissions' %}active{% endif %}" href="/admin/permissions">Permessi</a>
+        <a class="{% if request.url.path == '/admin/launch-readiness' %}active{% endif %}" href="/admin/launch-readiness">Lancio</a>
+        {% else %}
+        <a class="{% if request.url.path == '/employee/dashboard' %}active{% endif %}" href="/employee/dashboard">Le mie richieste</a>
+        <a class="{% if request.url.path == '/staff/notifications' %}active{% endif %}" href="/staff/notifications">Notifiche</a>
+        {% endif %}
+      </nav>
+      <a class="backoffice-logout" href="/logout">Esci</a>
+    </aside>
+    <div class="backoffice-main">
+      <header class="backoffice-topbar">
+        <div>
+          <p>ConsultIQ Admin / Area Staff</p>
+          <strong>{{ user.full_name if user.full_name else 'Staff ConsultIQ' }}</strong>
+          <span>{{ role_label(user.role) }}</span>
+        </div>
+        <div class="backoffice-actions">
+          <a class="notification-bell" href="/staff/notifications" aria-label="Notifiche staff">Notifiche</a>
+        </div>
+      </header>
+  {% else %}
+  <header class="site-header"><div class="container nav-shell"><a class="brand brand-logo" href="/"><img src="/static/consultiq-logo.svg" alt="ConsultIQ"><span class="brand-name">Consultiq Italy</span></a><nav><a class="{% if page == 'home' %}active{% endif %}" href="/">Home</a><a class="{% if page == 'services' %}active{% endif %}" href="/services">Servizi</a><a class="{% if page == 'news' %}active{% endif %}" href="/news">Novita'</a><a class="{% if page == 'contact' %}active{% endif %}" href="/contact">Contatti</a>{% if user and user.role == 'client' %}<a class="{% if page == 'client' %}active{% endif %}" href="/client-area">Area cliente</a>{% endif %}{% if not user %}<a href="/login">Area cliente</a><a href="/admin-login">Area staff</a>{% endif %}</nav></div></header>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+
+  {% if is_staff_area %}
+    </div>
+  </div>
+  {% else %}
+  <footer class="site-footer"><div class="container footer-shell"><div class="footer-brand"><a class="footer-logo" href="/"><img src="/static/consultiq-logo.svg" alt="ConsultIQ"></a><p>Hai bisogno di aiuto o hai una domanda?</p><div class="footer-badges"><span>CAF e Patronato</span><span>Immigrazione e Visti</span><span>Gestione Imprese</span></div><div class="footer-social"><a class="social-icon social-whatsapp" href="https://wa.me/393444881606" target="_blank" rel="noreferrer" aria-label="WhatsApp"><span class="sr-only">WhatsApp</span></a><a class="social-icon social-instagram" href="https://www.instagram.com/consultiq.it/" target="_blank" rel="noreferrer" aria-label="Instagram"><span class="sr-only">Instagram</span></a><a class="social-icon social-facebook" href="https://www.facebook.com/ConsultiqItaly?locale=it_IT" target="_blank" rel="noreferrer" aria-label="Facebook"><span class="sr-only">Facebook</span></a></div></div><div class="footer-column"><h3>I Nostri Settori</h3><a href="/services">CAF e Patronato</a><a href="/services">Gestione Imprese</a><a href="/services">Immigrazione e Visti</a><a href="/services">Lavoro Domestico</a><a href="/services">Assicurazioni</a><a href="/services">Consulenza Legale e Tecnica</a><a href="/services">Servizi al Cittadino</a></div><div class="footer-column"><h3>Servizi Principali</h3><a href="/services/caf-isee">Dichiarazione ISEE</a><a href="/services/caf-730">Modello 730 e Redditi</a><a href="/services/patronato-disoccupazione">Domande INPS (Naspi, Pensioni)</a><a href="/services/immigration-residence-permit">Permessi di Soggiorno</a><a href="/services/caf-successioni">Successioni e Volture</a></div><div class="footer-column footer-contact"><h3>Contattaci</h3><p>Hai bisogno di aiuto o hai una domanda?</p><p>Via Licinio Murena 32-34, Roma (Metro A - Numidio Quadrato)</p><a href="https://www.google.com/maps/search/?api=1&query=Via%20Licinio%20Murena%2032-34%2C%20Roma" target="_blank" rel="noreferrer">Google Maps</a><a href="tel:+390697616812">Telefono: 0697616812</a><a href="https://wa.me/393444881606" target="_blank" rel="noreferrer">WhatsApp: 344 488 1606</a><a href="mailto:info@consultiq.it">info@consultiq.it</a><a class="footer-cta" href="/contact">Contattaci</a></div></div><div class="container footer-bottom"><p>&copy; 2026 Consultiq Italy | Codice Fiscale: 96632710586 | PEC: cafconsultiq@pec.it | Tutti i diritti riservati.</p><div class="footer-legal"><a href="/privacy">Privacy</a><a href="/terms">Termini e Condizioni</a><a href="/cookie-policy">Cookie Policy</a></div></div></footer>
+  <a class="whatsapp-float" href="https://wa.me/393444881606" target="_blank" rel="noreferrer" aria-label="Chat su WhatsApp"><span class="sr-only">WhatsApp</span></a>
+  <div class="mobile-cta-bar"><a href="tel:+390697616812">Chiama</a><a href="https://wa.me/393444881606" target="_blank" rel="noreferrer">WhatsApp</a><a href="/contact">Richiedi aiuto</a></div>
+  {% endif %}
+  <div class="cookie-banner" data-cookie-banner hidden><div class="cookie-banner__content"><strong>{{ cookie_banner_copy.title }}</strong><p>Usiamo cookie tecnici essenziali e, solo con il tuo consenso, strumenti analitici. {{ cookie_banner_copy.warning }}</p></div><div class="cookie-banner__actions"><button class="btn primary small" type="button" data-cookie-action="accept-all">Accetta tutto</button><button class="btn ghost small" type="button" data-cookie-action="reject-nonessential">Rifiuta non essenziali</button><button class="btn ghost small" type="button" data-cookie-action="manage">Gestisci preferenze</button></div></div>
+  <div class="consent-modal" data-cookie-modal hidden><div class="consent-modal__panel card"><p class="pill">Cookie</p><h2>Gestisci preferenze</h2><p>Puoi cambiare idea in qualsiasi momento. I cookie tecnici restano attivi per sicurezza e funzionamento del portale.</p><label class="consent-choice"><input type="checkbox" checked disabled><span>Cookie tecnici essenziali</span></label><label class="consent-choice"><input type="checkbox" data-cookie-analytics><span>Cookie analitici e misurazione traffico</span></label><p class="muted-note">{{ cookie_banner_copy.warning }}</p><div class="actions compact"><button class="btn primary small" type="button" data-cookie-action="save-preferences">Salva preferenze</button><button class="btn ghost small" type="button" data-cookie-action="close-modal">Chiudi</button></div></div></div>
+  <script src="/static/js/security.js" defer></script>
+  <script src="/static/js/cookies.js" defer></script>
+  <script src="/static/js/dashboard.js" defer></script>
+  {% if structured_data %}<script type="application/ld+json">{{ structured_data | safe }}</script>{% endif %}
+</body>
+</html>

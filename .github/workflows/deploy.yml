@@ -1,0 +1,32 @@
+﻿name: Deploy ConsultIQ
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -p "${{ secrets.SERVER_PORT || '22' }}" "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Sync deploy script to server
+        run: |
+          scp -P "${{ secrets.SERVER_PORT || '22' }}" scripts/deploy.sh "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/tmp/consultiq-deploy.sh"
+
+      - name: Run deploy on server
+        run: |
+          ssh -p "${{ secrets.SERVER_PORT || '22' }}" "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" "chmod +x /tmp/consultiq-deploy.sh && DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' /tmp/consultiq-deploy.sh"

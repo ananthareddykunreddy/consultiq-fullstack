@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container narrow">
+    <p class="pill">Compliance</p>
+    <h1>{{ heading }}</h1>
+    <article class="card legal-copy">
+      <div class="flash error">{{ "Da verificare da un consulente legale" }}</div>
+      {% if policy_type == "privacy" %}
+      <p>Questa informativa descrive in modo provvisorio come ConsultIQ tratta dati anagrafici, documentali e di contatto raccolti tramite il portale, le prenotazioni e l'area clienti. Il testo definitivo deve essere validato da un professionista legale o commercialista prima della pubblicazione finale.</p>
+      <h3>Titolare e finalita'</h3>
+      <p>Il titolare del trattamento dovra' essere confermato nei documenti contrattuali definitivi. I dati vengono raccolti per gestione pratiche CAF/Patronato, prenotazioni, caricamento documenti, comunicazioni di servizio, sicurezza applicativa e supporto clienti.</p>
+      <h3>Base giuridica e conservazione</h3>
+      <p>La base giuridica puo' includere esecuzione di misure precontrattuali, adempimenti di legge, consenso per comunicazioni informative e legittimo interesse per sicurezza e audit tecnico. I tempi di conservazione vanno confermati dal consulente legale in base alla tipologia di pratica.</p>
+      <h3>Diritti dell'interessato</h3>
+      <p>L'utente puo' richiedere accesso, rettifica, limitazione, cancellazione ove applicabile ed esportazione dei dati. Sono presenti strumenti tecnici di export e anonimizzazione, da utilizzare solo dopo verifica procedurale interna.</p>
+      {% elif policy_type == "cookies" %}
+      <p>Il sito utilizza cookie tecnici necessari al funzionamento dell'area privata, della protezione CSRF, della sessione e delle preferenze essenziali. Eventuali strumenti analitici devono restare disattivati finche' l'utente non esprime consenso esplicito tramite banner o pannello preferenze.</p>
+      <h3>Categorie cookie</h3>
+      <p>Cookie tecnici essenziali, cookie di preferenza, eventuali cookie analitici previa accettazione. Nessun cookie marketing o profilazione deve essere abilitato senza verifica tecnica e legale.</p>
+      <h3>Gestione consenso</h3>
+      <p>Le preferenze vengono salvate localmente nel browser per supportare il comportamento del banner. Per una configurazione definitiva serve revisione legale e verifica dell'inventario cookie in produzione.</p>
+      {% elif policy_type == "gdpr" %}
+      <p>Questa pagina riepiloga le misure tecniche predisposte nel portale: autenticazione, logging, controllo accessi, validazione upload, audit log, strumenti di export/anonymization e gestione consensi. Non costituisce dichiarazione di piena conformita' normativa.</p>
+      <h3>Misure organizzative da completare</h3>
+      <p>Registro trattamenti, nomine responsabili, policy interne, retention legale, backup documentato, procedura data breach e testi definitivi per privacy/termini devono essere completati fuori dal codice applicativo.</p>
+      {% else %}
+      <p>I presenti Termini e Condizioni sono un modello operativo preliminare per la fornitura di servizi di assistenza amministrativa, CAF, Patronato, immigrazione e supporto documentale. Il testo finale deve essere revisionato da un consulente legale.</p>
+      <h3>Oggetto del servizio</h3>
+      <p>Il portale consente richiesta informazioni, prenotazione servizi, caricamento documenti, accesso area cliente e ricezione aggiornamenti di stato. La presa in carico definitiva di una pratica resta soggetta a verifica documentale e conferma da parte del team ConsultIQ.</p>
+      <h3>Limitazioni e responsabilita'</h3>
+      <p>Il sito non deve promettere agevolazioni, esiti amministrativi o tempi garantiti. Eventuali preventivi, documenti obbligatori, scadenze e condizioni economiche devono essere confermati caso per caso.</p>
+      {% endif %}
+      <h3>Contatti</h3>
+      <p>Per richieste amministrative o privacy: info@consultiq.it, PEC: cafconsultiq@pec.it, sede: Via Licinio Murena 32-34, Roma.</p>
+    </article>
+  </div>
+</main>
+{% endblock %}

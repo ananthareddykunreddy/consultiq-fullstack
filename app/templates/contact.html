@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<main class="section">
+  <div class="container split">
+    <div>
+      <p class="pill">Contatti</p>
+      <h1>Contattaci o richiedi supporto</h1>
+      <p class="lead">Siamo a Roma, in Via Licinio Murena 32-34, vicino Metro A Numidio Quadrato. Possiamo aiutarti a organizzare documenti, richieste e pratiche amministrative.</p>
+      {% if submitted %}<div class="flash success">Richiesta inviata correttamente. Ti risponderemo appena possibile.</div>{% endif %}
+      <form class="form" method="post" action="/contact">
+        <label>Nome e cognome<input type="text" name="full_name" required></label>
+        <label>Email<input type="email" name="email" required></label>
+        <label>Telefono<input type="text" name="phone"></label>
+        <label>Oggetto<input type="text" name="subject" value="{{ selected_service if selected_service else '' }}" required></label>
+        <label>Messaggio<textarea name="message" rows="4" placeholder="Descrivi la tua richiesta o la pratica da seguire" required></textarea></label>
+        <label class="consent-check"><input type="checkbox" name="privacy_accept" value="1" required><span>Ho letto e accetto l'Informativa Privacy</span></label>
+        <label class="consent-check"><input type="checkbox" name="marketing_accept" value="1"><span>Acconsento a ricevere comunicazioni informative e promozionali</span></label>
+        <button class="btn primary" type="submit">Invia richiesta</button>
+      </form>
+    </div>
+    <aside class="card">
+      <h3>Sede ConsultIQ</h3>
+      <p>Via Licinio Murena 32-34, Roma (Metro A - Numidio Quadrato)</p>
+      <div class="map-frame">
+        <iframe title="Mappa sede Consultiq Italy" src="https://www.google.com/maps?q=Via%20Licinio%20Murena%2032-34%2C%20Roma&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <p><a class="inline-link" href="https://www.google.com/maps/search/?api=1&query=Via%20Licinio%20Murena%2032-34%2C%20Roma" target="_blank" rel="noreferrer">Apri in Google Maps</a></p>
+      <p><a class="inline-link" href="tel:+390697616812">Telefono: 0697616812</a></p>
+      <p><a class="inline-link" href="https://wa.me/393444881606" target="_blank" rel="noreferrer">WhatsApp: 344 488 1606</a></p>
+      <p><a class="inline-link" href="mailto:info@consultiq.it">info@consultiq.it</a></p>
+      <h3>Invia una richiesta pratica</h3>
+      <p class="muted-note">Compila il modulo e il team ti contattera' per confermare documenti richiesti, tempistiche e modalita' operative.</p>
+      <form class="form plain" method="post" action="/appointments" enctype="multipart/form-data">
+        <label>Nome e cognome<input type="text" name="full_name" value="{{ user.full_name if user else '' }}" required></label>
+        <label>Email<input type="email" name="email" value="{{ user.email if user else '' }}" required></label>
+        <label>Telefono<input type="text" name="phone" value="{{ user.phone if user and user.phone else '' }}" required></label>
+        <label>Servizio
+          <select name="service_type" required>
+            <option value="">Seleziona un servizio</option>
+            {% for title in service_titles %}<option value="{{ title }}" {% if selected_service == title %}selected{% endif %}>{{ display_service_type(title) }}</option>{% endfor %}
+          </select>
+        </label>
+        <label>Dettagli pratica<textarea name="message" rows="3" placeholder="Indica documenti gia' disponibili, urgenze o note utili"></textarea></label>
+        <label>Carica documento (opzionale)<input type="file" name="document" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"></label>
+        <label class="consent-check"><input type="checkbox" name="privacy_accept" value="1" required><span>Ho letto e accetto l'Informativa Privacy</span></label>
+        <label class="consent-check"><input type="checkbox" name="terms_accept" value="1" required><span>Accetto i Termini e Condizioni del servizio</span></label>
+        <label class="consent-check"><input type="checkbox" name="marketing_accept" value="1"><span>Acconsento a ricevere comunicazioni informative e promozionali</span></label>
+        <button class="btn primary" type="submit">Invia richiesta pratica</button>
+      </form>
+    </aside>
+  </div>
+</main>
+{% endblock %}
